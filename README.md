@@ -13,10 +13,14 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 
 `git clone https://github.com/turtlecoin/turtlecoin-wallet-nodejs/`
 
-2. Install the dependencies
+2. Change directory to the local repository.
+
+`cd turtlecoin-wallet-nodejs`
+
+3. Install the dependencies
 
 `npm install`
 
-3. Start the program
+4. Start the program
 
 `npm start`
