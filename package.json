@@ -1,0 +1,29 @@
+{
+  "name": "divinewallet",
+  "version": "0.0.1",
+  "description": "A TUI wallet for TurtleCoin powered by turtlecoin-wallet-backend-js, utilizing the Blessed high-level terminal interface library.",
+  "main": "wallet.js",
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "turtlecoin-wallet-backend": "^1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node wallet.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExtraHash/DivineWallet.git"
+  },
+  "keywords": [
+    "turtlecoin",
+    "crypto",
+    "blessed"
+  ],
+  "author": "ExtraHash",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ExtraHash/DivineWallet/issues"
+  },
+  "homepage": "https://github.com/ExtraHash/DivineWallet#readme"
+}
