@@ -1,14 +1,18 @@
 let blessed = require('blessed');
 const WB = require('turtlecoin-wallet-backend');
-// const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
-const daemon = new WB.ConventionalDaemon('127.0.0.1', '11898');
+const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 
-// Create a screen object.
 let screen = blessed.screen({
   smartCSR: true
 });
 
 screen.title = 'DivineWallet v0.0.1';
+
+init();
+
+async function init() {
+// Create a screen object.
+
 
 // Create a welcomeScreen perfectly centered horizontally and vertically.
 let welcomeScreen = blessed.box({
@@ -370,6 +374,8 @@ closeWalletButton.on('press', function () {
 
 // initial render
 screen.render();
+}
+
 
 function createWallet(fileName, password) {
   const wallet = WB.WalletBackend.createWallet(daemon);
