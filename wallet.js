@@ -1,6 +1,7 @@
 let blessed = require('blessed');
 const WB = require('turtlecoin-wallet-backend');
-const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
+// const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
+const daemon = new WB.ConventionalDaemon('127.0.0.1', '11898');
 
 // Create a screen object.
 let screen = blessed.screen({
@@ -9,8 +10,8 @@ let screen = blessed.screen({
 
 screen.title = 'DivineWallet v0.0.1';
 
-// Create a box perfectly centered horizontally and vertically.
-let box = blessed.box({
+// Create a welcomeScreen perfectly centered horizontally and vertically.
+let welcomeScreen = blessed.box({
   top: 'center',
   left: 'center',
   width: '100%',
@@ -22,12 +23,12 @@ let box = blessed.box({
   }
 });
 
-// Append our box to the screen.
-screen.append(box);
+// Append our welcomeScreen to the screen.
+screen.append(welcomeScreen);
 
 // create the opening menu
 let welcomeForm = blessed.form({
-  parent: box,
+  parent: welcomeScreen,
   keys: true,
   left: 'center',
   top: 'center',
@@ -43,8 +44,8 @@ let welcomeForm = blessed.form({
     '███    ███ ███▌ ███    ███ ███▌ ███   ███  ▄███▄▄▄     \n' +
     '███    ███ ███▌ ███    ███ ███▌ ███   ███ ▀▀███▀▀▀     \n' +
     '███    ███ ███  ███    ███ ███  ███   ███   ███    █▄  \n' +
-    '███   ▄███ ███  ███    ███ ███  ███   ███   ███    ███ \n' +
-    '████████▀  █▀    ▀██████▀  █▀    ▀█   █▀    ██████████\n'
+    '███   ▄███ ███   ██    ██  ███  ███   ███   ███    ███ \n' +
+    '████████▀  █▀     ▀████▀   █▀    ▀█   █▀    ██████████\n'
 
 });
 
@@ -156,28 +157,30 @@ openWalletButton.on('press', function () {
 
   let openForm = blessed.form({
     parent: welcomeForm,
-    width: '30%',
-    left: '0%',
-    top: '70%',
+    width: '50%',
+    left: '25%',
+    top: '50%',
     keys: true,
     vi: true
   });
 
   let openLabel = blessed.text({
     parent: openForm,
-    top: '10%',
+    top: '0%',
     left: '0%',
     fg: 'white',
-    content: 'Please enter your wallet filename...'
+    content: 'Filename:'
   });
 
   let fileName = blessed.textbox({
     parent: openForm,
     name: 'filename',
-    top: '40%',
+    top: '15%',
     left: '0%',
+    width: '100%',
     mouse: true,
     inputOnFocus: true,
+    keys: true,
     height: 3,
     content: 'first',
     border: {
@@ -187,20 +190,47 @@ openWalletButton.on('press', function () {
     fg: 'white',
   });
 
-  let openFileButton = blessed.button({
+  let openPasswordLabel = blessed.text({
+    parent: openForm,
+    top: '35%',
+    left: '0%',
+    fg: 'white',
+    content: 'Password:'
+  });
+
+  let password = blessed.textbox({
+    parent: openForm,
+    name: 'password',
+    top: '45%',
+    left: '0%',
+    width: '100%',
+    mouse: true,
+    inputOnFocus: true,
+    keys: true,
+    height: 3,
+    content: 'first',
+    border: {
+      type: 'line',
+      fg: 'white'
+    },
+    fg: 'black',
+  });
+
+  let openWalletButton = blessed.button({
     parent: openForm,
     mouse: true,
     keys: true,
     shrink: true,
+    tags: true,
     padding: {
       left: 1,
       right: 1
     },
     left: '0%',
-    top: '85%',
+    top: '70%',
     shrink: true,
-    name: 'openfile',
-    content: 'Open File (enter)',
+    name: 'openwallet',
+    content: 'open wallet (enter)',
     style: {
       bg: 'black',
       fg: 'white',
@@ -212,27 +242,191 @@ openWalletButton.on('press', function () {
 
   screen.render();
 
-  openFileButton.on('press', function () {
-    box.destroy();
+  openWalletButton.on('press', function () {
+    openForm.submit();
+    welcomeScreen.destroy();
     screen.render();
   });
+
+
+  openForm.on('submit', function (data) {
+    launchWallet(data.filename, data.password)
+  });
+
 });
 
+// if create button is pressed
+createWalletButton.on('press', function () {
 
+  let createForm = blessed.form({
+    parent: welcomeForm,
+    width: '50%',
+    left: '25%',
+    top: '50%',
+    keys: true,
+    vi: true
+  });
+
+  let createLabel = blessed.text({
+    parent: createForm,
+    top: '0%',
+    left: '0%',
+    fg: 'white',
+    content: 'Filename:'
+  });
+
+  let fileName = blessed.textbox({
+    parent: createForm,
+    name: 'filename',
+    top: '15%',
+    left: '0%',
+    width: '100%',
+    mouse: true,
+    inputOnFocus: true,
+    keys: true,
+    height: 3,
+    content: 'first',
+    border: {
+      type: 'line',
+      fg: 'white'
+    },
+    fg: 'white',
+  });
+
+  let createPasswordLabel = blessed.text({
+    parent: createForm,
+    top: '35%',
+    left: '0%',
+    fg: 'white',
+    content: 'Password:'
+  });
+
+  let password = blessed.textbox({
+    parent: createForm,
+    name: 'password',
+    top: '45%',
+    left: '0%',
+    width: '100%',
+    mouse: true,
+    inputOnFocus: true,
+    keys: true,
+    height: 3,
+    content: 'first',
+    border: {
+      type: 'line',
+      fg: 'white'
+    },
+    fg: 'black',
+  });
+
+  let createWalletButton = blessed.button({
+    parent: createForm,
+    mouse: true,
+    keys: true,
+    shrink: true,
+    tags: true,
+    padding: {
+      left: 1,
+      right: 1
+    },
+    left: '0%',
+    top: '70%',
+    shrink: true,
+    name: 'createwallet',
+    content: 'create wallet (enter)',
+    style: {
+      bg: 'black',
+      fg: 'white',
+      hover: {
+        bg: 'red'
+      }
+    }
+  });
+
+  screen.render();
+
+  createWalletButton.on('press', function () {
+    createForm.submit();
+    welcomeScreen.destroy();
+    screen.render();
+  });
+
+
+  createForm.on('submit', function (data) {
+    createWallet(data.filename, data.password)
+  });
+
+});
 
 // Quit on Escape, q, or Control-C.
 screen.key(['escape', 'q', 'C-c'], function (ch, key) {
   return process.exit(0);
 });
 
-// Render the screen.
+// quit on top right button
+closeWalletButton.on('press', function () {
+  return process.exit(0);
+})
+
+// initial render
 screen.render();
 
-function createWallet() {
+function createWallet(fileName, password) {
   const wallet = WB.WalletBackend.createWallet(daemon);
-  wallet.saveWalletToFile('test.wallet', 'test');
+  wallet.saveWalletToFile(`${fileName}.wallet`, password);
+  wallet.stop();
+  launchWallet(fileName, password);
 }
 
 function humanReadable(amount) {
   return (amount / 100).toFixed(2);
+}
+
+function launchWallet(fileName, password) {
+
+  // do something
+  let walletScreen = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: '100%',
+    height: '100%',
+    tags: true,
+    style: {
+      fg: 'white',
+      bg: 'black',
+    }
+  });
+  screen.append(walletScreen);
+  let walletMessage = blessed.text({
+    parent: walletScreen,
+    top: '1%',
+    left: '0%',
+    fg: 'white',
+    tags: true
+  });
+  const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
+  if(error) {
+    walletMessage.setContent('Error opening wallet...\n' + error);
+  } else {
+    walletMessage.setContent(`{red-fg}{bold}${wallet.getPrimaryAddress()}{/}`);
+  }
+
+  let syncStatus = blessed.text({
+    parent: walletScreen,
+    top: '90%',
+    fg: 'white',
+    tags: true
+  })
+  screen.render();  
+
+  refreshSync(syncStatus, wallet);
+  setInterval(refreshSync.bind(null,syncStatus,wallet), 5000);
+
+  
+
+  // const primaryAddress = wallet.getPrimaryAddress();
+};
+
+function refreshSync(syncStatus, wallet) {
+  syncStatus.setContent(`Synchronizing: ${wallet.getSyncStatus()[0]} / ${wallet.getSyncStatus()[2]}`);
 }
