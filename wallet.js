@@ -380,8 +380,8 @@ screen.render();
 function createWallet(fileName, password) {
   const wallet = WB.WalletBackend.createWallet(daemon);
   wallet.saveWalletToFile(`${fileName}.wallet`, password);
-  wallet.stop();
   launchWallet(fileName, password);
+  wallet.stop();
 }
 
 function humanReadable(amount) {
@@ -403,36 +403,182 @@ function launchWallet(fileName, password) {
     }
   });
   screen.append(walletScreen);
-  let walletMessage = blessed.text({
+
+  let navBar = blessed.box({
     parent: walletScreen,
-    top: '1%',
+    top: '0%',
+    left:'0%',
+    width: '100%',
+    height: '10%',
+    bg: 'black'
+  })
+
+  let walletNavButton = blessed.button({
+    parent: navBar,
+    mouse: true,
+    keys: true,
+    shrink: true,
+    padding: {
+      left: 2,
+      right: 2
+    },
+    left: 0,
+    top: '0%',
+    shrink: true,
+    name: 'wallet',
+    content: 'wallet',
+    style: {
+      bg: 'red',
+      fg: 'white',
+      hover: {
+        bg: 'red',
+        fg: 'white'
+      }
+    }
+  })
+
+  let transferNavButton = blessed.button({
+    parent: navBar,
+    mouse: true,
+    keys: true,
+    shrink: true,
+    padding: {
+      left: 1,
+      right: 1
+    },
+    left: 10,
+    top: '0%',
+    shrink: true,
+    name: 'transfer',
+    content: 'transfer',
+    style: {
+      bg: 'grey',
+      fg: 'white',
+      hover: {
+        bg: 'red',
+        fg: 'white'
+      }
+    }
+  })
+
+  let settingsNavButton = blessed.button({
+    parent: navBar,
+    mouse: true,
+    keys: true,
+    shrink: true,
+    padding: {
+      left: 1,
+      right: 1
+    },
+    left: 20,
+    top: '0%',
+    shrink: true,
+    name: 'settings',
+    content: 'settings',
+    style: {
+      bg: 'grey',
+      fg: 'white',
+      hover: {
+        bg: 'red',
+        fg: 'white'
+      }
+    }
+  })
+
+  let walletAddressInfo = blessed.box({
+    parent: walletScreen,
+    top: '10%',
+    left: '0%',
+    width: '50%',
+    height: '90%',
+    tags: true,
+    style: {
+      fg: 'white',
+      bg: 'black',
+    }
+    
+  });
+
+
+  let walletAddress = blessed.text({
+    parent: walletAddressInfo,
+    top: '0%',
     left: '0%',
     fg: 'white',
-    tags: true
+    tags: true,
+    style: {
+      fg: 'red',
+    }
   });
   const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
   if(error) {
-    walletMessage.setContent('Error opening wallet...\n' + error);
+    walletAddress.setContent('Error opening wallet...\n' + error);
   } else {
-    walletMessage.setContent(`{red-fg}{bold}${wallet.getPrimaryAddress()}{/}`);
+    walletAddress.setContent(`{red-fg}{bold}${wallet.getPrimaryAddress()}{/}`);
   }
+
+  wallet.start();
 
   let syncStatus = blessed.text({
     parent: walletScreen,
-    top: '90%',
+    top: '95%',
     fg: 'white',
     tags: true
   })
+
+  let walletBalance = blessed.text({
+    parent: walletScreen,
+    top: '30%',
+    fg: 'white',
+    tags: true
+  })
+
   screen.render();  
 
-  refreshSync(syncStatus, wallet);
-  setInterval(refreshSync.bind(null,syncStatus,wallet), 5000);
+  refreshSync(syncStatus, walletBalance, wallet, walletScreen);
+  setInterval(refreshSync.bind(null, syncStatus, walletBalance, wallet, walletScreen), 1000);
 
   
 
   // const primaryAddress = wallet.getPrimaryAddress();
 };
 
-function refreshSync(syncStatus, wallet) {
-  syncStatus.setContent(`Synchronizing: ${wallet.getSyncStatus()[0]} / ${wallet.getSyncStatus()[2]}`);
+function refreshSync(syncStatus, walletBalance, wallet, walletScreen) {
+  let syncBarFill = (wallet.getSyncStatus()[0]/wallet.getSyncStatus()[2]*100).toFixed(0);
+  let walletBalanceData = wallet.getBalance();
+  syncStatus.setContent(`{bold}Synchronization:{/} ${syncBarFill}%`);
+  walletBalance.setContent(`Unlocked Balance:    {bold}${humanReadable(walletBalanceData[0])} TRTL{/}\n` +
+                            `Locked Balance:      {bold}{red-fg}${humanReadable(walletBalanceData[1])} TRTL{/}\n` +
+                            `Total Balance:       ${humanReadable(walletBalanceData[1] + walletBalanceData[0])} TRTL`)
+  let progress = blessed.progressbar({
+    parent: walletScreen,
+    style: {
+      fg: 'red',
+      bg: 'default',
+      bar: {
+        bg: 'default',
+        fg: 'red'
+      },
+      border: {
+        fg: 'default',
+        bg: 'default'
+      }
+    },
+    ch: ':',
+    width: '100%',
+    height: 1,
+    top: '98%',
+    left: '0%',
+    filled: 0
+  });
+  progress.setProgress(syncBarFill);
+  screen.render();
+}
+
+function return0IfNotNumber(value) {
+  if (value === NaN) {
+    return 0;
+  } else {
+    return value;
+  }
 }
