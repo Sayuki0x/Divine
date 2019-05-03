@@ -8,6 +8,7 @@ const WB = require('turtlecoin-wallet-backend');
 let blessed = require('blessed');
 const clipboardy = require('clipboardy');
 
+
 // set daemon
 const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 
@@ -870,15 +871,23 @@ function drawWalletWindow(fileName, password) {
   screen.key(['escape', 'q', 'C-c'], function (ch, key) {
     return process.exit(0);
   });
-  
+
   // quit on top right button
   closeWalletButton.on('press', function () {
     return process.exit(0);
   })
 
-  addressButton.on('press'), function() {
-    clipboardy.write('testing lol');
-  }
+  addressButton.on('click', async function() {
+    clipboardy.writeSync(addressString);
+    let notificationText = blessed.text({
+      parent: walletWindow,
+      top: '40%',
+      fg: 'grey',
+      content: `Copied to clipboard!`
+    })
+    await sleep(500);
+    notificationText.destroy();
+  });
 
 };
 
@@ -923,4 +932,8 @@ function refreshSync(syncStatus, walletBalance, wallet, walletScreen) {
 
 function humanReadable(amount) {
   return (amount / 100).toFixed(2);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
