@@ -1,14 +1,14 @@
    ///////////////////////////////////////////////////////////////
   //    Copyright ExtraHash 2019                               //
- //     Please see included LICENSE files for more details    //
+ //     Please see included LICENSE file for more details     //
 ///////////////////////////////////////////////////////////////
 
 // requires
 const WB = require('turtlecoin-wallet-backend');
-let blessed = require('blessed');
 const clipboardy = require('clipboardy');
+const blessed = require('blessed');
+const contrib = require('blessed-contrib');
 let wallet;
-
 
 // set daemon
 const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
@@ -17,6 +17,17 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 let screen = blessed.screen({
     smartCSR: true,
     title: 'DivineWallet v0.0.2'
+});
+
+// Quit on Escape, q, or Control-C.
+screen.key(['escape', 'q', 'C-c'], function(ch, key) {
+    if (typeof wallet === 'undefined') {
+        return process.exit(0);
+    } else {
+        wallet.saveWalletToFile(filename, password);   
+        wallet.stop();
+        return process.exit(0);
+    }
 });
 
 // run the initial function
@@ -82,7 +93,7 @@ function drawSplashScreen() {
         top: 'center',
         left: 'center',
         width: 55,
-        height: '90%',
+        height: '100%',
         tags: true,
         style: {
             fg: 'white',
@@ -93,7 +104,7 @@ function drawSplashScreen() {
     // set text fields for start screen 
     let asciiArt = blessed.text({
         parent: splashText,
-        top: 0,
+        top: '10%',
         left: 'center',
         width: '100%',
         fg: 'red',
@@ -101,7 +112,7 @@ function drawSplashScreen() {
     })
     let welcomeMessage = blessed.text({
         parent: splashText,
-        top: 15,
+        top: '60%',
         left: 'center',
         fg: 'white',
         tags: true
@@ -119,17 +130,6 @@ function drawSplashScreen() {
         '████████▀  █▀     ▀████▀   █▀    ▀█   █▀    ██████████\n'
     )
     welcomeMessage.setContent('{bold}PRESS START{/}');
-
-    // Quit on Escape, q, or Control-C.
-    screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-        if (typeof wallet === 'undefined') {
-            return process.exit(0);
-        } else {
-            wallet.saveWalletToFile(filename, password);   // ReferenceError: wallet is not defined
-            wallet.stop();
-            return process.exit(0);
-        }
-    });
 
     // quit on top right button
     closeWalletButton.on('press', function() {
@@ -152,7 +152,7 @@ function drawSplashScreen() {
     screen.render();
 }
 
-// draw the start window
+// draw the start win   dow
 function drawStartWindow() {
 
     // draw the navbar
@@ -186,7 +186,7 @@ function drawStartWindow() {
         parent: startWindow,
         keys: true,
         left: 'center',
-        top: 'center',
+        top: '30%',
         width: 15,
         height: 5,
         bg: 'black',
@@ -377,7 +377,7 @@ function drawOpenWindow() {
         parent: openWindow,
         keys: true,
         left: 'center',
-        top: 'center',
+        top: '20%',
         width: 35,
         height: 11,
         bg: 'black',
@@ -472,6 +472,8 @@ function drawOpenWindow() {
     // render the screen
     screen.render();
 
+
+
     // on submit button press
     openWalletButton.on('press', function() {
         openForm.submit();
@@ -551,7 +553,7 @@ function drawCreateWindow() {
         parent: createWindow,
         keys: true,
         left: 'center',
-        top: 'center',
+        top: '20%',
         width: 35,
         height: 11,
         bg: 'black',
@@ -626,14 +628,14 @@ function drawCreateWindow() {
         shrink: true,
         tags: true,
         padding: {
-            left: 7,
-            right: 7
+            left: 6,
+            right: 6
         },
         left: 0,
         top: 8,
         shrink: true,
         name: 'openwallet',
-        content: 'open wallet (enter)',
+        content: 'create wallet (enter)',
         style: {
             bg: 'black',
             fg: 'white',
@@ -738,7 +740,7 @@ function drawWalletWindow(fileName, password) {
         content: 'wallet',
         style: {
             bg: 'red',
-            fg: 'white',
+            fg: 'white',    
             hover: {
                 bg: 'red',
                 fg: 'white'
@@ -762,7 +764,7 @@ function drawWalletWindow(fileName, password) {
         name: 'transfer',
         content: 'transfer',
         style: {
-            bg: 'grey',
+            bg: 'black',
             fg: 'white',
             hover: {
                 bg: 'red',
@@ -787,7 +789,7 @@ function drawWalletWindow(fileName, password) {
         name: 'settings',
         content: 'settings',
         style: {
-            bg: 'grey',
+            bg: 'black',
             fg: 'white',
             hover: {
                 bg: 'red',
@@ -813,10 +815,11 @@ function drawWalletWindow(fileName, password) {
     // define error printer
     let errorPrinter = blessed.text({
         parent: leftColumn,
-        top: '80%',
-        lfet: '50%',
+        top: '50%',
+        left: '0%',
         fg: 'white',
         tags: true,
+        // content: 'Error opening wallet...',
         style: {
             fg: 'white',
         }
@@ -866,16 +869,15 @@ function drawWalletWindow(fileName, password) {
         parent: leftColumn,
         top: 5,
         fg: 'white',
-        tags: true,
-        content: 'walletBalance'
+        tags: true
     });
 
     // print wallet address
     let walletBalanceData = wallet.getBalance();
     walletBalance.setContent(
-        `Unlocked Balance:    {bold}${humanReadable(walletBalanceData[0])} TRTL{/}\n` +
-        `Locked Balance:      {bold}{red-fg}${humanReadable(walletBalanceData[1])} TRTL{/}\n` +
-        `Total Balance:       ${humanReadable(walletBalanceData[1] + walletBalanceData[0])} TRTL`);
+        `{bold}Unlocked Balance:    ${humanReadable(walletBalanceData[0])} TRTL{/}\n` +
+        `{bold}{red-fg}Locked Balance:      ${humanReadable(walletBalanceData[1])} TRTL{/}\n` +
+        `{grey-fg}Total Balance:       ${humanReadable(walletBalanceData[1] + walletBalanceData[0])} TRTL{/}`);
 
     // render the screen
     screen.render();
@@ -890,13 +892,45 @@ function drawWalletWindow(fileName, password) {
         top: 0,
         left: '51%',
         width: '50%',
-        height: '90%',
+        height: '100%',
         tags: true,
         style: {
             fg: 'white',
             bg: 'black',
         }
     });
+
+    let txData = wallet.getTransactions();
+
+    let recentTransactions = blessed.text({
+        parent: rightColumn,
+        top: 0,
+        fg: 'white',
+        tags: true,
+        content: JSON.stringify(txData[1])
+    });
+
+    var transactionTable = contrib.table(
+        { keys: true
+        , fg: 'white'
+        , selectedFg: 'white'
+        , selectedBg: 'blue'
+        , interactive: true
+        , label: 'Recent Transactions'
+        , width: '30%'
+        , height: '30%'
+        , border: {type: "line", fg: "cyan"}
+        , columnSpacing: 10 //in chars
+        , columnWidth: [16, 12, 12] /*in chars*/ })
+   
+      //allow control the table with the keyboard
+      transactionTable.focus()
+   
+      transactionTable.setData(
+      { headers: ['col1', 'col2', 'col3']
+      , data:
+         [ [1, 2, 3]
+         , [4, 5, 6] ]})
 
     // quit on top right button
     closeWalletButton.on('press', function() {
@@ -918,7 +952,7 @@ function drawWalletWindow(fileName, password) {
         })
 
         // wait .5s and destroy the notification text
-        await sleep(1000);
+        await sleep(2000);
         notificationText.destroy();
 
         // get wallet data and set it in walletBalance
@@ -926,7 +960,10 @@ function drawWalletWindow(fileName, password) {
         walletBalance.setContent(
             `Unlocked Balance:    {bold}${humanReadable(updateBalance[0])} TRTL{/}\n` +
             `Locked Balance:      {bold}{red-fg}${humanReadable(updateBalance[1])} TRTL{/}\n` +
-            `Total Balance:       ${humanReadable(updateBalance[1] + updateBalance[0])} TRTL`);
+            `Total Balance:       {grey-fg}${humanReadable(updateBalance[1] + updateBalance[0])} TRTL{/}`);
+
+        let transactionData = wallet.getTransactions();
+        recentTransactions.setContent(JSON.stringify(transactionData));
 
         // render the screen
         screen.render();
