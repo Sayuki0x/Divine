@@ -7,6 +7,7 @@
 const WB = require('turtlecoin-wallet-backend');
 let blessed = require('blessed');
 const clipboardy = require('clipboardy');
+let wallet;
 
 
 // set daemon
@@ -121,7 +122,7 @@ function drawSplashScreen() {
 
     // Quit on Escape, q, or Control-C.
     screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-        if (typeof wallet === undefined) {
+        if (typeof wallet === 'undefined') {
             return process.exit(0);
         } else {
             wallet.saveWalletToFile(filename, password);   // ReferenceError: wallet is not defined
@@ -306,12 +307,7 @@ function drawStartWindow() {
         navBar.destroy();
         drawCreateWindow();
     })
-/*
-    // Quit on Escape, q, or Control-C.
-    screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-        return process.exit(0);
-    });
-*/
+
     // quit on top right button
     closeWalletButton.on('press', function() {
         startWindow.destroy();
@@ -901,12 +897,7 @@ function drawWalletWindow(fileName, password) {
             bg: 'black',
         }
     });
-/*
-    // Quit on Escape, q, or Control-C.
-    screen.key(['escape', 'q', 'C-c'], async function(ch, key) {
-        return process.exit(0);
-    });
-*/
+
     // quit on top right button
     closeWalletButton.on('press', function() {
         wallet.saveWalletToFile(`${fileName}.wallet`, password);
