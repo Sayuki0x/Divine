@@ -6,6 +6,7 @@
 // requires
 const WB = require('turtlecoin-wallet-backend');
 let blessed = require('blessed');
+const clipboardy = require('clipboardy');
 
 // set daemon
 const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
@@ -122,6 +123,11 @@ function drawSplashScreen() {
     return process.exit(0);
   });
   
+  // quit on top right button
+  closeWalletButton.on('press', function () {
+    return process.exit(0);
+  })
+
   // keyboard commands for PRESS START
   screen.key(['enter'], function (ch, key) {
     splashWindow.destroy();
@@ -132,11 +138,6 @@ function drawSplashScreen() {
     splashWindow.destroy();
     navBar.destroy();
     drawStartWindow();
-  })
-
-  // quit on top right button
-  closeWalletButton.on('press', function () {
-    return process.exit(0);
   })
 
   // render the screen
@@ -685,7 +686,32 @@ function drawWalletWindow(fileName, password) {
   screen.append(walletWindow);
   screen.append(navBar);
 
-  // define nav buttons
+  // render the X button
+  let closeWalletButton = blessed.button({
+    parent: navBar,
+    mouse: true,
+    keys: true,
+    shrink: true,
+    padding: {
+      left: 1,
+      right: 1
+    },
+    left: '97%',
+    top: '0%',
+    shrink: true,
+    name: 'close',
+    content: 'X',
+    style: {
+      bg: 'black',
+      fg: 'red',
+      hover: {
+        bg: 'red',
+        fg: 'white'
+      }
+    }
+  })
+
+  // define wallet button
   let walletNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -709,6 +735,8 @@ function drawWalletWindow(fileName, password) {
       }
     }
   })
+
+  // define transfers button
   let transferNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -718,7 +746,7 @@ function drawWalletWindow(fileName, password) {
       left: 1,
       right: 1
     },
-    left: 10,
+    left: 11,
     top: '0%',
     shrink: true,
     name: 'transfer',
@@ -732,6 +760,8 @@ function drawWalletWindow(fileName, password) {
       }
     }
   })
+
+  // define settings button
   let settingsNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -741,7 +771,7 @@ function drawWalletWindow(fileName, password) {
       left: 1,
       right: 1
     },
-    left: 20,
+    left: 22,
     top: '0%',
     shrink: true,
     name: 'settings',
@@ -762,17 +792,16 @@ function drawWalletWindow(fileName, password) {
     top: '10%',
     left: '0%',
     width: '50%',
-    height: '90%',
+    height: '100%',
     tags: true,
     style: {
       fg: 'white',
       bg: 'black',
     }
-
   });
 
   // define wallet address
-  let walletAddress = blessed.text({
+  let errorPrinter = blessed.text({
     parent: leftColumn,
     top: '0%',
     left: '0%',
@@ -786,16 +815,38 @@ function drawWalletWindow(fileName, password) {
   // define and start the wallet
   const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
   if (error) {
-    walletAddress.setContent('Error opening wallet...\n' + error);
-  } else {
-    walletAddress.setContent(`{red-fg}{bold}${wallet.getPrimaryAddress()}{/}`);
-  }
+    errorPrinter.setContent('Error opening wallet...\n' + error);
+  } 
   wallet.start();
+
+  // get the wallet address
+  const addressString = wallet.getPrimaryAddress();
+
+  // define the address button
+  let addressButton = blessed.button({
+  parent: leftColumn,
+  mouse: false,
+  keys: true,
+  shrink: true,
+  left: 0,
+  top: 0,
+  shrink: true,
+  name: 'address',
+  content: addressString,
+  style: {
+    bg: 'black',
+    fg: 'white',
+    hover: {
+      bg: 'black',
+      fg: 'red'
+    }
+  }
+}) 
 
   // define the progress bar for sync
   let syncStatus = blessed.text({
     parent: walletWindow,
-    top: '95%',
+    top: '100%',
     fg: 'white',
     tags: true
   })
@@ -814,6 +865,21 @@ function drawWalletWindow(fileName, password) {
   // refresh the progress bar every second
   refreshSync(syncStatus, walletBalance, wallet, walletWindow);
   setInterval(refreshSync.bind(null, syncStatus, walletBalance, wallet, walletWindow), 1000);
+
+  // Quit on Escape, q, or Control-C.
+  screen.key(['escape', 'q', 'C-c'], function (ch, key) {
+    return process.exit(0);
+  });
+  
+  // quit on top right button
+  closeWalletButton.on('press', function () {
+    return process.exit(0);
+  })
+
+  addressButton.on('press'), function() {
+    clipboardy.write('testing lol');
+  }
+
 };
 
 function createWallet(fileName, password) {

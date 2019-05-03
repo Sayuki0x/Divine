@@ -5,6 +5,7 @@
   "main": "wallet.js",
   "dependencies": {
     "blessed": "^0.1.81",
+    "clipboardy": "^2.0.0",
     "turtlecoin-wallet-backend": "^1.1.1"
   },
   "devDependencies": {},
