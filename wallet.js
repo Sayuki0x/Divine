@@ -1,30 +1,29 @@
+   ///////////////////////////////////////////////////////////////
+  //    Copyright ExtraHash 2019                               //
+ //     Please see included LICENSE files for more details    //
+///////////////////////////////////////////////////////////////
+
+// requires
 const WB = require('turtlecoin-wallet-backend');
-const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 let blessed = require('blessed');
+
+// set daemon
+const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
+
+// setup and configure screen instance
 let screen = blessed.screen({
-  smartCSR: true
+  smartCSR: true,
+  title: 'DivineWallet v0.0.2'
 });
 
-screen.title = 'DivineWallet v0.0.1';
-
+// run the initial function
 drawSplashScreen();
 
-async function drawSplashScreen() {
+// splash screen code
+function drawSplashScreen() {
 
-  let splashBox = blessed.box({
-    top: 'center',
-    left: 'center',
-    width: '100%',
-    height: '100%',
-    tags: true,
-    style: {
-      fg: 'white',
-      bg: 'black',
-    }
-  });
-
+  // draw the navbar
   let navBar = blessed.box({
-    parent: splashBox,
     top: '0%',
     left: '0%',
     width: '100%',
@@ -32,6 +31,24 @@ async function drawSplashScreen() {
     bg: 'black'
   })
 
+  // draw the window
+  let splashWindow = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: '100%',
+    height: '90%',
+    tags: true,
+    style: {
+      fg: 'white',
+      bg: 'black',
+    }
+  });
+
+  // append the areas
+  screen.append(navBar);
+  screen.append(splashWindow);
+
+  // render the X button
   let closeWalletButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -56,9 +73,9 @@ async function drawSplashScreen() {
     }
   })
 
-
-  let splashScreen = blessed.box({
-    parent: splashBox,
+  // set ascii art column
+  let splashText = blessed.box({
+    parent: splashWindow,
     top: 'center',
     left: 'center',
     width: 55,
@@ -70,26 +87,24 @@ async function drawSplashScreen() {
     }
   });
 
-  screen.append(navBar);
-  screen.append(splashScreen);
-
+  // set text fields for start screen 
   let asciiArt = blessed.text({
-    parent: splashScreen,
+    parent: splashText,
     top: 0,
     left: 'center',
     width: '100%',
     fg: 'red',
     tags: true
   })
-
   let welcomeMessage = blessed.text({
-    parent: splashScreen,
+    parent: splashText,
     top: 15,
     left: 'center',
     fg: 'white',
     tags: true
   });
 
+  // set the content of the text fields
   asciiArt.setContent(
     '\n████████▄   ▄█   ▄█    █▄   ▄█  ███▄▄▄▄      ▄████████\n' +
     '███   ▀███ ███  ███    ███ ███  ███▀▀▀██▄   ███    ███\n' +
@@ -100,7 +115,6 @@ async function drawSplashScreen() {
     '███   ▄███ ███   ██    ██  ███  ███   ███   ███    ███ \n' +
     '████████▀  █▀     ▀████▀   █▀    ▀█   █▀    ██████████\n'
   )
-
   welcomeMessage.setContent('{bold}PRESS START{/}');
 
   // Quit on Escape, q, or Control-C.
@@ -108,9 +122,16 @@ async function drawSplashScreen() {
     return process.exit(0);
   });
   
+  // keyboard commands for PRESS START
   screen.key(['enter'], function (ch, key) {
-    splashScreen.destroy();
-    drawStartMenu();
+    splashWindow.destroy();
+    navBar.destroy();
+    drawStartWindow();
+  })
+  splashWindow.on('click', function () {
+    splashWindow.destroy();
+    navBar.destroy();
+    drawStartWindow();
   })
 
   // quit on top right button
@@ -118,21 +139,27 @@ async function drawSplashScreen() {
     return process.exit(0);
   })
 
-  splashScreen.on('click', function () {
-    splashScreen.destroy();
-    drawStartMenu();
-  })
-
+  // render the screen
   screen.render();
 }
 
-async function drawStartMenu() {
-  // Create a welcomeScreen
-  let startMenu = blessed.box({
+function drawStartWindow() {
+
+  // draw the navbar
+  let navBar = blessed.box({
+    top: '0%',
+    left: '0%',
+    width: '100%',
+    height: '10%',
+    bg: 'black'
+  })  
+
+  // Create a opening menu window
+  let startWindow = blessed.box({
     top: 'center',
     left: 'center',
     width: '100%',
-    height: '100%',
+    height: '90%',
     tags: true,
     style: {
       fg: 'white',
@@ -141,11 +168,12 @@ async function drawStartMenu() {
   });
 
   // Append our welcomeScreen to the screen.
-  screen.append(startMenu);
+  screen.append(navBar);
+  screen.append(startWindow);
 
   // create the opening menu
-  let startMenuForm = blessed.form({
-    parent: startMenu,
+  let startForm = blessed.form({
+    parent: startWindow,
     keys: true,
     left: 'center',
     top: 'center',
@@ -159,8 +187,9 @@ async function drawStartMenu() {
     }
   });
 
+  // define the close button
   let closeWalletButton = blessed.button({
-    parent: startMenu,
+    parent: navBar,
     mouse: true,
     keys: true,
     shrink: true,
@@ -183,8 +212,9 @@ async function drawStartMenu() {
     }
   })
 
+  // define the "open wallet" button
   let openWalletButton = blessed.button({
-    parent: startMenuForm,
+    parent: startForm,
     mouse: true,
     keys: true,
     shrink: true,
@@ -206,8 +236,9 @@ async function drawStartMenu() {
     }
   });
 
+  // define the "create wallet" button
   let createWalletButton = blessed.button({
-    parent: startMenuForm,
+    parent: startForm,
     mouse: true,
     keys: true,
     shrink: true,
@@ -229,8 +260,9 @@ async function drawStartMenu() {
     }
   });
 
+  // define the "import wallet" button
   let importWalletButton = blessed.button({
-    parent: startMenuForm,
+    parent: startForm,
     mouse: true,
     keys: true,
     shrink: true,
@@ -254,13 +286,16 @@ async function drawStartMenu() {
 
   // if open button is pressed
   openWalletButton.on('press', function () {
-    startMenu.destroy();
-    drawOpenMenuForm();
+    startWindow.destroy();
+    navBar.destroy();
+    drawOpenWindow();
   });
 
+  // if create button is pressed
   createWalletButton.on('press', function () {
-    startMenu.destroy();
-    drawCreateMenuForm();
+    startWindow.destroy();
+    navBar.destroy();
+    drawCreateWindow();
   })
 
   // Quit on Escape, q, or Control-C.
@@ -277,8 +312,9 @@ async function drawStartMenu() {
   screen.render();
 }
 
-function drawOpenMenuForm() {
+function drawOpenWindow() {
 
+  // draw the navbar
   let navBar = blessed.box({
     top: '0%',
     left: '0%',
@@ -287,7 +323,8 @@ function drawOpenMenuForm() {
     bg: 'black'
   })
 
-  let openMenuForm = blessed.box({
+  // draw the window
+  let openWindow = blessed.box({
     top: 'center',
     left: 'center',
     width: '100%',
@@ -299,9 +336,11 @@ function drawOpenMenuForm() {
     }
   });
 
-  screen.append(openMenuForm);
+  // append the elements to the screen
+  screen.append(openWindow);
   screen.append(navBar);
 
+  //  define close wallet button
   let closeWalletButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -326,8 +365,9 @@ function drawOpenMenuForm() {
     }
   })
 
+  // define "open wallet" info form
   let openForm = blessed.form({
-    parent: openMenuForm,
+    parent: openWindow,
     keys: true,
     left: 'center',
     top: 'center',
@@ -341,6 +381,7 @@ function drawOpenMenuForm() {
     }
   });
 
+  // define filename textbox label
   let openLabel = blessed.text({
     parent: openForm,
     top: 0,
@@ -349,6 +390,7 @@ function drawOpenMenuForm() {
     content: 'Filename:'
   });
 
+  // define filename textbox
   let fileName = blessed.textbox({
     parent: openForm,
     name: 'filename',
@@ -367,6 +409,7 @@ function drawOpenMenuForm() {
     fg: 'white',
   });
 
+  // define password textbox label
   let openPasswordLabel = blessed.text({
     parent: openForm,
     top: 4,
@@ -375,6 +418,7 @@ function drawOpenMenuForm() {
     content: 'Password:'
   });
 
+  // defind password textbox
   let password = blessed.textbox({
     parent: openForm,
     name: 'password',
@@ -393,6 +437,7 @@ function drawOpenMenuForm() {
     fg: 'white',
   });
 
+  // define submit button
   let openWalletButton = blessed.button({
     parent: openForm,
     mouse: true,
@@ -417,26 +462,31 @@ function drawOpenMenuForm() {
     }
   });
 
+  // render the screen
   screen.render();
 
+  // on submit button press
   openWalletButton.on('press', function () {
     openForm.submit();
-    openMenuForm.destroy();
+    openWindow.destroy();
+    navBar.destroy();
     screen.render();
+  });
+
+  // open form post handling
+  openForm.on('submit', function (data) {
+    drawWalletWindow(data.filename, data.password)
   });
 
   // quit on top right button
   closeWalletButton.on('press', function () {
     return process.exit(0);
   })
-
-  openForm.on('submit', function (data) {
-    launchWallet(data.filename, data.password)
-  });
 }
 
-function drawCreateMenuForm() {
+function drawCreateWindow() {
 
+  // draw the navbar
   let navBar = blessed.box({
     top: '0%',
     left: '0%',
@@ -445,7 +495,8 @@ function drawCreateMenuForm() {
     bg: 'black'
   })
 
-  let createMenuForm = blessed.box({
+  // draw the window
+  let createWindow = blessed.box({
     top: 'center',
     left: 'center',
     width: '100%',
@@ -457,9 +508,11 @@ function drawCreateMenuForm() {
     }
   });
 
-  screen.append(createMenuForm);
+  // append elements to screen instance
+  screen.append(createWindow);
   screen.append(navBar);
 
+  // define close wallet buton
   let closeWalletButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -484,8 +537,9 @@ function drawCreateMenuForm() {
     }
   })
 
+  // define open wallet form
   let createForm = blessed.form({
-    parent: createMenuForm,
+    parent: createWindow,
     keys: true,
     left: 'center',
     top: 'center',
@@ -499,6 +553,7 @@ function drawCreateMenuForm() {
     }
   });
 
+  // define filename textbox label
   let createLabel = blessed.text({
     parent: createForm,
     top: 0,
@@ -507,6 +562,7 @@ function drawCreateMenuForm() {
     content: 'Filename:'
   });
 
+  // define filename textbox
   let fileName = blessed.textbox({
     parent: createForm,
     name: 'filename',
@@ -525,6 +581,7 @@ function drawCreateMenuForm() {
     fg: 'white',
   });
 
+  // define password textbox label
   let openPasswordLabel = blessed.text({
     parent: createForm,
     top: 4,
@@ -533,6 +590,7 @@ function drawCreateMenuForm() {
     content: 'Password:'
   });
 
+  // define password textbox
   let password = blessed.textbox({
     parent: createForm,
     name: 'password',
@@ -551,6 +609,7 @@ function drawCreateMenuForm() {
     fg: 'white',
   });
 
+  // define create form submit button
   let createWalletButton = blessed.button({
     parent: createForm,
     mouse: true,
@@ -575,13 +634,20 @@ function drawCreateMenuForm() {
     }
   });
 
+  // render the screen
   screen.render();
 
+  // on create wallet button press
   createWalletButton.on('press', function () {
     createForm.submit();
-    createMenuForm.destroy();
+    createWindow.destroy();
     navBar.destroy();
     screen.render();
+  });
+
+  // create form post handling
+  createForm.on('submit', function (data) {
+    createWallet(data.filename, data.password);
   });
 
   // quit on top right button
@@ -589,29 +655,12 @@ function drawCreateMenuForm() {
     return process.exit(0);
   })
 
-  createForm.on('submit', function (data) {
-    createWallet(data.filename, data.password);
-  });
 }
 
-function launchWallet(fileName, password) {
+function drawWalletWindow(fileName, password) {
 
-  // do something
-  let walletScreen = blessed.box({
-    top: 'center',
-    left: 'center',
-    width: '100%',
-    height: '100%',
-    tags: true,
-    style: {
-      fg: 'white',
-      bg: 'black',
-    }
-  });
-  screen.append(walletScreen);
-
+  // set the navbar
   let navBar = blessed.box({
-    parent: walletScreen,
     top: '0%',
     left: '0%',
     width: '100%',
@@ -619,6 +668,24 @@ function launchWallet(fileName, password) {
     bg: 'black'
   })
 
+  // set the window
+  let walletWindow = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: '100%',
+    height: '90%',
+    tags: true,
+    style: {
+      fg: 'white',
+      bg: 'black',
+    }
+  });
+
+  // append the elements
+  screen.append(walletWindow);
+  screen.append(navBar);
+
+  // define nav buttons
   let walletNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -642,7 +709,6 @@ function launchWallet(fileName, password) {
       }
     }
   })
-
   let transferNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -666,7 +732,6 @@ function launchWallet(fileName, password) {
       }
     }
   })
-
   let settingsNavButton = blessed.button({
     parent: navBar,
     mouse: true,
@@ -691,8 +756,9 @@ function launchWallet(fileName, password) {
     }
   })
 
-  let walletAddressInfo = blessed.box({
-    parent: walletScreen,
+  // define left column
+  let leftColumn = blessed.box({
+    parent: walletWindow,
     top: '10%',
     left: '0%',
     width: '50%',
@@ -705,9 +771,9 @@ function launchWallet(fileName, password) {
 
   });
 
-
+  // define wallet address
   let walletAddress = blessed.text({
-    parent: walletAddressInfo,
+    parent: leftColumn,
     top: '0%',
     left: '0%',
     fg: 'white',
@@ -716,43 +782,46 @@ function launchWallet(fileName, password) {
       fg: 'red',
     }
   });
+
+  // define and start the wallet
   const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
   if (error) {
     walletAddress.setContent('Error opening wallet...\n' + error);
   } else {
     walletAddress.setContent(`{red-fg}{bold}${wallet.getPrimaryAddress()}{/}`);
   }
-
   wallet.start();
 
+  // define the progress bar for sync
   let syncStatus = blessed.text({
-    parent: walletScreen,
+    parent: walletWindow,
     top: '95%',
     fg: 'white',
     tags: true
   })
 
+  // define the wallet balance
   let walletBalance = blessed.text({
-    parent: walletScreen,
+    parent: walletWindow,
     top: '30%',
     fg: 'white',
     tags: true
   })
 
-  function ready() {
-    screen.render()
-  }
-
-  ready();
+  // render the screen
   screen.render();
 
-  refreshSync(syncStatus, walletBalance, wallet, walletScreen);
-  setInterval(refreshSync.bind(null, syncStatus, walletBalance, wallet, walletScreen), 1000);
-
-
-
-  // const primaryAddress = wallet.getPrimaryAddress();
+  // refresh the progress bar every second
+  refreshSync(syncStatus, walletBalance, wallet, walletWindow);
+  setInterval(refreshSync.bind(null, syncStatus, walletBalance, wallet, walletWindow), 1000);
 };
+
+function createWallet(fileName, password) {
+  const wallet = WB.WalletBackend.createWallet(daemon);
+  wallet.saveWalletToFile(`${fileName}.wallet`, password);
+  wallet.stop();
+  drawWalletWindow(fileName, password);
+}
 
 function refreshSync(syncStatus, walletBalance, wallet, walletScreen) {
   let syncBarFill = (wallet.getSyncStatus()[0] / wallet.getSyncStatus()[2] * 100).toFixed(0);
@@ -788,11 +857,4 @@ function refreshSync(syncStatus, walletBalance, wallet, walletScreen) {
 
 function humanReadable(amount) {
   return (amount / 100).toFixed(2);
-}
-
-function createWallet(fileName, password) {
-  const wallet = WB.WalletBackend.createWallet(daemon);
-  wallet.saveWalletToFile(`${fileName}.wallet`, password);
-  wallet.stop();
-  launchWallet(fileName, password);
 }
