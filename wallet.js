@@ -8,7 +8,6 @@ const WB = require('turtlecoin-wallet-backend');
 const clipboardy = require('clipboardy');
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
-let wallet;
 
 // set daemon
 const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
@@ -17,17 +16,6 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 let screen = blessed.screen({
     smartCSR: true,
     title: 'DivineWallet v0.0.2'
-});
-
-// Quit on Escape, q, or Control-C.
-screen.key(['escape', 'q', 'C-c'], function(ch, key) {
-    if (typeof wallet === 'undefined') {
-        return process.exit(0);
-    } else {
-        wallet.saveWalletToFile(filename, password);   
-        wallet.stop();
-        return process.exit(0);
-    }
 });
 
 // run the initial function
@@ -131,25 +119,33 @@ function drawSplashScreen() {
     )
     welcomeMessage.setContent('{bold}PRESS START{/}');
 
+    splashWindow.focus();
+
+    // render the screen
+    screen.render();
+
+    // keyboard commands for PRESS START
+    splashWindow.key(['enter'], function(ch, key) {
+            splashWindow.destroy();
+            navBar.destroy();
+            drawStartWindow();
+    })
+
+    splashWindow.key(['x'], function(ch, key) {
+        return process.exit(0);
+})
+
     // quit on top right button
     closeWalletButton.on('press', function() {
         return process.exit(0);
     })
 
-    // keyboard commands for PRESS START
-    screen.key(['enter'], function(ch, key) {
-        splashWindow.destroy();
-        navBar.destroy();
-        drawStartWindow();
-    })
     splashWindow.on('click', function() {
         splashWindow.destroy();
         navBar.destroy();
         drawStartWindow();
     })
 
-    // render the screen
-    screen.render();
 }
 
 // draw the start win   dow
@@ -294,12 +290,36 @@ function drawStartWindow() {
         }
     });
 
+    // focus window and render screen
+    startWindow.focus();
+    screen.render();
+
+    // o keypress
+    startWindow.key(['o'], function(ch, key) {
+        startWindow.destroy();
+        navBar.destroy();
+        drawOpenWindow();
+    })
+
+    // c keypress
+    startWindow.key(['c'], function(ch, key) {
+        startWindow.destroy();
+        navBar.destroy();
+        drawCreateWindow();
+    })  
+
+    startWindow.key(['x'], function(ch, key) {
+        startWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
     // if open button is pressed
     openWalletButton.on('press', function() {
         startWindow.destroy();
         navBar.destroy();
         drawOpenWindow();
-    });
+    }); 
 
     // if create button is pressed
     createWalletButton.on('press', function() {
@@ -311,6 +331,7 @@ function drawStartWindow() {
     // quit on top right button
     closeWalletButton.on('press', function() {
         startWindow.destroy();
+        navBar.destroy();
         drawSplashScreen();
     })
 
@@ -411,7 +432,7 @@ function drawOpenWindow() {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'red'
+            fg: 'grey'
         },
         fg: 'white',
     });
@@ -435,11 +456,12 @@ function drawOpenWindow() {
         mouse: true,
         inputOnFocus: true,
         keys: true,
+        censor: true,
         height: 3,
         content: 'first',
         border: {
             type: 'line',
-            fg: 'red'
+            fg: 'grey'
         },
         fg: 'white',
     });
@@ -470,9 +492,39 @@ function drawOpenWindow() {
     });
 
     // render the screen
+    fileName.focus();
     screen.render();
 
+    // enter keypress
+    openWindow.key(['enter'], function(ch, key) {
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })  
 
+    // enter keypress
+    fileName.key(['enter'], function(ch, key) {
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })  
+
+    // enter keypress
+    password.key(['enter'], function(ch, key) {
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })  
+
+    // x keypress
+    openWindow.key(['x'], function(ch, key) {
+        openWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
 
     // on submit button press
     openWalletButton.on('press', function() {
@@ -492,6 +544,8 @@ function drawOpenWindow() {
         openWindow.destroy();
         drawSplashScreen();
     })
+
+
 }
 
 // draw the create window
@@ -587,7 +641,7 @@ function drawCreateWindow() {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'red'
+            fg: 'grey'
         },
         fg: 'white',
     });
@@ -611,11 +665,12 @@ function drawCreateWindow() {
         mouse: true,
         inputOnFocus: true,
         keys: true,
+        censor: true,
         height: 3,
         content: 'first',
         border: {
             type: 'line',
-            fg: 'red'
+            fg: 'grey'
         },
         fg: 'white',
     });
@@ -803,9 +858,13 @@ function drawWalletWindow(fileName, password) {
         parent: walletWindow,
         top: 0,
         left: 0,
-        width: '49%',
-        height: '90%',
+        width: '50%',
+        height: '100%',
         tags: true,
+        border: {
+            type: 'line',
+            fg: 'red'
+        },
         style: {
             fg: 'white',
             bg: 'black',
@@ -859,7 +918,8 @@ function drawWalletWindow(fileName, password) {
     // define the progress bar for sync
     let syncStatus = blessed.text({
         parent: leftColumn,
-        top: '99%',
+        top: '80%',
+        left: 0,
         fg: 'white',
         tags: true
     });
@@ -868,19 +928,31 @@ function drawWalletWindow(fileName, password) {
     let walletBalance = blessed.text({
         parent: leftColumn,
         top: 5,
+        left: '50%',
         fg: 'white',
         tags: true
     });
 
+    let walletBalanceLabels = blessed.text({
+        parent: leftColumn,
+        top: 5,
+        left: 0,
+        fg: 'white',
+        tags: true
+    });
+
+    walletBalanceLabels.setContent(
+        '{bold}Available:{/}\n' +
+        '{bold}{red-fg}Locked:{/}\n' +
+        '{grey-fg}Total:{/}'
+    );
+
     // print wallet address
     let walletBalanceData = wallet.getBalance();
     walletBalance.setContent(
-        `{bold}Unlocked Balance:    ${humanReadable(walletBalanceData[0])} TRTL{/}\n` +
-        `{bold}{red-fg}Locked Balance:      ${humanReadable(walletBalanceData[1])} TRTL{/}\n` +
-        `{grey-fg}Total Balance:       ${humanReadable(walletBalanceData[1] + walletBalanceData[0])} TRTL{/}`);
-
-    // render the screen
-    screen.render();
+        `{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/}\n` +
+        `{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
+        `{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/}`);
 
     // refresh the progress bar every second
     refreshSync(syncStatus, wallet, walletWindow);
@@ -890,7 +962,7 @@ function drawWalletWindow(fileName, password) {
     let rightColumn = blessed.box({
         parent: walletWindow,
         top: 0,
-        left: '51%',
+        left: '50%',
         width: '50%',
         height: '100%',
         tags: true,
@@ -901,42 +973,50 @@ function drawWalletWindow(fileName, password) {
     });
 
     let txData = wallet.getTransactions();
+    let txArray = getRecentTransactions(txData)
 
-    let recentTransactions = blessed.text({
+    walletWindow.focus();
+    screen.render();
+
+    let transactionTable = contrib.table({ 
         parent: rightColumn,
-        top: 0,
-        fg: 'white',
-        tags: true,
-        content: JSON.stringify(txData[1])
-    });
+        keys: true, 
+        bg: 'black',
+        fg: 'grey',
+        selectedFg: 'white',
+        selectedBg: 'black',
+        interactive: true,
+        label: 'Recent Transactions',
+        width: '100%',
+        height: '100%',
+        border: {type: "line", fg: "red"},
+        columnSpacing: 6,
+        columnWidth: [18, 20] })
 
-    var transactionTable = contrib.table(
-        { keys: true
-        , fg: 'white'
-        , selectedFg: 'white'
-        , selectedBg: 'blue'
-        , interactive: true
-        , label: 'Recent Transactions'
-        , width: '30%'
-        , height: '30%'
-        , border: {type: "line", fg: "cyan"}
-        , columnSpacing: 10 //in chars
-        , columnWidth: [16, 12, 12] /*in chars*/ })
-   
-      //allow control the table with the keyboard
-      transactionTable.focus()
-   
-      transactionTable.setData(
-      { headers: ['col1', 'col2', 'col3']
-      , data:
-         [ [1, 2, 3]
-         , [4, 5, 6] ]})
+    transactionTable.setData(
+    { headers: ['Time', 'Amount']
+    , data: txArray})
 
-    // quit on top right button
-    closeWalletButton.on('press', function() {
+    //allow control the table with the keyboard
+    // transactionTable.focus()
+    screen.render();
+
+    // x keypress
+    walletWindow.key(['x'], function(ch, key) {
         wallet.saveWalletToFile(`${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        screen.render();
+        wallet.saveWalletToFile(`${fileName}.wallet`, password);
+        wallet.stop();
+        walletWindow.destroy();
+        navBar.destroy();
         drawSplashScreen();
     })
 
@@ -945,8 +1025,9 @@ function drawWalletWindow(fileName, password) {
 
         // define notification text
         let notificationText = blessed.text({
-            parent: walletWindow,
-            top: 3,
+            parent: navBar,
+            top: 0,
+            left: '70%',
             fg: 'grey',
             content: `New transaction found!`
         })
@@ -958,12 +1039,9 @@ function drawWalletWindow(fileName, password) {
         // get wallet data and set it in walletBalance
         let updateBalance = wallet.getBalance();
         walletBalance.setContent(
-            `Unlocked Balance:    {bold}${humanReadable(updateBalance[0])} TRTL{/}\n` +
-            `Locked Balance:      {bold}{red-fg}${humanReadable(updateBalance[1])} TRTL{/}\n` +
-            `Total Balance:       {grey-fg}${humanReadable(updateBalance[1] + updateBalance[0])} TRTL{/}`);
-
-        let transactionData = wallet.getTransactions();
-        recentTransactions.setContent(JSON.stringify(transactionData));
+            `{bold}${WB.prettyPrintAmount(updateBalance[0])}{/}\n` +
+            `{bold}{red-fg}${WB.prettyPrintAmount(updateBalance[1])}{/}\n` +
+            `{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
 
         // render the screen
         screen.render();
@@ -977,8 +1055,9 @@ function drawWalletWindow(fileName, password) {
 
         // define notification text
         let notificationText = blessed.text({
-            parent: walletWindow,
-            top: 3,
+            parent: navBar,
+            top: 0,
+            left: '70%',
             fg: 'grey',
             content: `Copied to clipboard!`
         })
@@ -1002,7 +1081,7 @@ function createWallet(fileName, password) {
 // refresh the sync bar
 function refreshSync(syncStatus, wallet, walletScreen) {
     let syncBarFill = (wallet.getSyncStatus()[0] / wallet.getSyncStatus()[2] * 100).toFixed(0);
-    syncStatus.setContent(`{bold}Synchronization:{/} ${syncBarFill}%`);
+    syncStatus.setContent(`{bold}Synchronization:{/} ${wallet.getSyncStatus()[0]}/${wallet.getSyncStatus()[1]} ${syncBarFill}%`);
     let progress = blessed.progressbar({
         parent: walletScreen,
         style: {
@@ -1037,3 +1116,24 @@ function humanReadable(amount) {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+function getRecentTransactions(walletData) {
+    let amountArray = [];
+    for (const tx of walletData) {
+        amountArray.push([convertTimestamp(tx.timestamp), humanReadable(tx.totalAmount())]);
+    }
+    return amountArray
+}
+
+function convertTimestamp(timestamp) {
+    let d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
+          yyyy = d.getFullYear(),
+          mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
+          dd = ('0' + d.getDate()).slice(-2),			// Add leading 0.
+          hh = ('0' + d.getHours()).slice(-2),
+          min = ('0' + d.getMinutes()).slice(-2),		// Add leading 0.
+          time;
+      // ie: 2013-02-18, 16:35	
+      time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
+      return time;
+  }
