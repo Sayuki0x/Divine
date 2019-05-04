@@ -8,6 +8,7 @@ const WB = require('turtlecoin-wallet-backend');
 const clipboardy = require('clipboardy');
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
+const fs = require('fs');
 let wallet;
 
 // set daemon
@@ -870,6 +871,17 @@ function drawWalletWindow(fileName, password) {
     if (error) {
         errorPrinter.setContent('Error opening wallet...');
     }
+
+    // configure logging
+    wallet.setLogLevel(WB.LogLevel.DEBUG);
+    wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
+        fs.writeFile(`${fileName}.log`, prettyMessage, (err) => {
+            if (err) console.log(err);
+        });
+
+    });
+
+    // start the wallet
     wallet.start();
 
     // get the wallet address
@@ -1002,7 +1014,6 @@ function drawWalletWindow(fileName, password) {
 
     // quit on top right button
     closeWalletButton.on('press', function() {
-        screen.render();
         wallet.saveWalletToFile(`${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
@@ -1046,16 +1057,6 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
-    // t keypress
-    walletWindow.key(['t'], function(ch, key) {
-        // some code
-    })
-
-    // t keypress
-    walletWindow.key(['t'], function(ch, key) {
-        // some code
-    })
-
     // on addressbutton click
     addressButton.on('click', async function() {
 
@@ -1089,7 +1090,7 @@ function createWallet(fileName, password) {
 
 // refresh the sync bar
 function refreshSync(syncStatus, wallet, walletScreen) {
-    let syncBarFill = (wallet.getSyncStatus()[0] / wallet.getSyncStatus()[2] * 100).toFixed(0);
+    let syncBarFill = (wallet.getSyncStatus()[0] / wallet.getSyncStatus()[2] * 100).toFixed(2);
     syncStatus.setContent(`{bold}Synchronization:{/} ${wallet.getSyncStatus()[0]}/${wallet.getSyncStatus()[1]} ${syncBarFill}%`);
     let progress = blessed.progressbar({
         parent: walletScreen,
