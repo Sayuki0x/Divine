@@ -8,6 +8,7 @@ const WB = require('turtlecoin-wallet-backend');
 const clipboardy = require('clipboardy');
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
+let wallet;
 
 // set daemon
 const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
@@ -15,7 +16,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.0.2'
+    title: 'DivineWallet v0.0.3'
 });
 
 // run the initial function
@@ -1022,6 +1023,14 @@ function drawWalletWindow(fileName, password) {
             `{bold}${WB.prettyPrintAmount(updateBalance[0])}{/}\n` +
             `{bold}{red-fg}${WB.prettyPrintAmount(updateBalance[1])}{/}\n` +
             `{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
+
+        let updateTransactionList = wallet.getTransactions();
+        
+        const updateTxArray = getRecentTransactions(updateTransactionList);
+
+        transactionTable.setData(
+            { headers: ['Time', 'Amount']
+            , data: updateTxArray})
 
         // render the screen
         screen.render();
