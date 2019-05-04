@@ -56,15 +56,11 @@ function drawSplashScreen() {
         mouse: true,
         keys: true,
         shrink: true,
-        padding: {
-            left: 1,
-            right: 1
-        },
         left: '97%',
         top: '0%',
         shrink: true,
         name: 'close',
-        content: 'X',
+        content: '(x)',
         style: {
             bg: 'black',
             fg: 'red',
@@ -199,15 +195,11 @@ function drawStartWindow() {
         mouse: true,
         keys: true,
         shrink: true,
-        padding: {
-            left: 1,
-            right: 1
-        },
         left: '97%',
         top: '0%',
         shrink: true,
         name: 'close',
-        content: 'X',
+        content: '(x)',
         style: {
             bg: 'black',
             fg: 'red',
@@ -374,15 +366,11 @@ function drawOpenWindow() {
         mouse: true,
         keys: true,
         shrink: true,
-        padding: {
-            left: 1,
-            right: 1
-        },
         left: '97%',
         top: '0%',
         shrink: true,
         name: 'close',
-        content: 'X',
+        content: '(x)',
         style: {
             bg: 'black',
             fg: 'red',
@@ -583,15 +571,11 @@ function drawCreateWindow() {
         mouse: true,
         keys: true,
         shrink: true,
-        padding: {
-            left: 1,
-            right: 1
-        },
         left: '97%',
         top: '0%',
         shrink: true,
         name: 'close',
-        content: 'X',
+        content: '(x)',
         style: {
             bg: 'black',
             fg: 'red',
@@ -759,15 +743,11 @@ function drawWalletWindow(fileName, password) {
         mouse: true,
         keys: true,
         shrink: true,
-        padding: {
-            left: 1,
-            right: 1
-        },
         left: '97%',
         top: '0%',
         shrink: true,
         name: 'close',
-        content: 'X',
+        content: '(x)',
         style: {
             bg: 'black',
             fg: 'red',
@@ -785,14 +765,14 @@ function drawWalletWindow(fileName, password) {
         keys: true,
         shrink: true,
         padding: {
-            left: 2,
-            right: 2
+            left: 1,
+            right: 1
         },
         left: 0,
         top: '0%',
         shrink: true,
         name: 'wallet',
-        content: 'wallet',
+        content: '(w)allet',
         style: {
             bg: 'red',
             fg: 'white',    
@@ -810,14 +790,14 @@ function drawWalletWindow(fileName, password) {
         keys: true,
         shrink: true,
         padding: {
-            left: 1,
-            right: 1
+            left: 0,
+            right: 0
         },
         left: 11,
         top: '0%',
         shrink: true,
         name: 'transfer',
-        content: 'transfer',
+        content: '(t)ransfer',
         style: {
             bg: 'black',
             fg: 'white',
@@ -835,14 +815,14 @@ function drawWalletWindow(fileName, password) {
         keys: true,
         shrink: true,
         padding: {
-            left: 1,
-            right: 1
+            left: 0,
+            right: 0
         },
         left: 22,
         top: '0%',
         shrink: true,
         name: 'settings',
-        content: 'settings',
+        content: '(s)ettings',
         style: {
             bg: 'black',
             fg: 'white',
@@ -863,7 +843,7 @@ function drawWalletWindow(fileName, password) {
         tags: true,
         border: {
             type: 'line',
-            fg: 'red'
+            fg: 'white'
         },
         style: {
             fg: 'white',
@@ -907,7 +887,7 @@ function drawWalletWindow(fileName, password) {
         content: addressString,
         style: {
             bg: 'black',
-            fg: 'white',
+            fg: 'grey',
             hover: {
                 bg: 'black',
                 fg: 'red'
@@ -989,7 +969,7 @@ function drawWalletWindow(fileName, password) {
         label: 'Recent Transactions',
         width: '100%',
         height: '100%',
-        border: {type: "line", fg: "red"},
+        border: {type: "line", fg: "white"},
         columnSpacing: 6,
         columnWidth: [18, 20] })
 
@@ -1027,8 +1007,8 @@ function drawWalletWindow(fileName, password) {
         let notificationText = blessed.text({
             parent: navBar,
             top: 0,
-            left: '70%',
-            fg: 'grey',
+            left: '60%',
+            fg: 'white',
             content: `New transaction found!`
         })
 
@@ -1047,6 +1027,16 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
+    // t keypress
+    walletWindow.key(['t'], function(ch, key) {
+        // some code
+    })
+
+    // t keypress
+    walletWindow.key(['t'], function(ch, key) {
+        // some code
+    })
+
     // on addressbutton click
     addressButton.on('click', async function() {
 
@@ -1057,7 +1047,7 @@ function drawWalletWindow(fileName, password) {
         let notificationText = blessed.text({
             parent: navBar,
             top: 0,
-            left: '70%',
+            left: '60%',
             fg: 'grey',
             content: `Copied to clipboard!`
         })
@@ -1117,6 +1107,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// get transactions list for recent transactions table
 function getRecentTransactions(walletData) {
     let amountArray = [];
     for (const tx of walletData) {
@@ -1125,6 +1116,7 @@ function getRecentTransactions(walletData) {
     return amountArray
 }
 
+// convert unix timestamp into human readable
 function convertTimestamp(timestamp) {
     let d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
           yyyy = d.getFullYear(),
