@@ -909,11 +909,12 @@ function drawWalletWindow(fileName, password) {
     let walletBalance = blessed.text({
         parent: leftColumn,
         top: 5,
-        left: '50%',
+        left: '45%',
         fg: 'white',
         tags: true
     });
 
+    // define balance labels
     let walletBalanceLabels = blessed.text({
         parent: leftColumn,
         top: 5,
@@ -922,14 +923,17 @@ function drawWalletWindow(fileName, password) {
         tags: true
     });
 
+    // set balance labels content
     walletBalanceLabels.setContent(
         '{bold}Available:{/}\n' +
         '{bold}{red-fg}Locked:{/}\n' +
         '{grey-fg}Total:{/}'
     );
 
-    // print wallet address
+    // get balance
     let walletBalanceData = wallet.getBalance();
+
+    // set balance content
     walletBalance.setContent(
         `{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/}\n` +
         `{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
