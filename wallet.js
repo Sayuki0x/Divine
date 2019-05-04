@@ -875,10 +875,8 @@ function drawWalletWindow(fileName, password) {
     // configure logging
     wallet.setLogLevel(WB.LogLevel.DEBUG);
     wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
-        fs.writeFile(`${fileName}.log`, prettyMessage, (err) => {
-            if (err) console.log(err);
-        });
-
+        let logStream = fs.createWriteStream(`${fileName}.log`, {flags: 'a'});
+        logStream.write(prettyMessage + '\n');
     });
 
     // start the wallet
