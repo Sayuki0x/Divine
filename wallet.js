@@ -722,6 +722,30 @@ function drawWalletWindow(fileName, password) {
         bg: 'black'
     })
 
+    let transferWindow = blessed.box({
+        top: '10%',
+        left: '0%',
+        width: '100%',
+        height: '100%',
+        tags: true,
+        style: {
+            fg: 'white',
+            bg: 'black',
+        }
+    });
+
+    let settingsWindow = blessed.box({
+        top: '10%',
+        left: '0%',
+        width: '100%',
+        height: '100%',
+        tags: true,
+        style: {
+            fg: 'white',
+            bg: 'black',
+        }
+    });
+
     // draw the window
     let walletWindow = blessed.box({
         top: '10%',
@@ -736,8 +760,12 @@ function drawWalletWindow(fileName, password) {
     });
 
     // append the elements
-    screen.append(walletWindow);
     screen.append(navBar);
+    screen.append(transferWindow);
+    screen.append(settingsWindow);
+    screen.append(walletWindow);
+
+    // NAV BAR ----------------------------------------------------------------------------
 
     // render the X button
     let closeWalletButton = blessed.button({
@@ -776,7 +804,7 @@ function drawWalletWindow(fileName, password) {
         name: 'wallet',
         content: '(w)allet',
         style: {
-            bg: 'red',
+            bg: 'black',
             fg: 'white',
             hover: {
                 bg: 'red',
@@ -835,6 +863,9 @@ function drawWalletWindow(fileName, password) {
         }
     })
 
+    // WALLET WINDOW ----------------------------------------------------------------------------
+
+
     // define left column
     let leftColumn = blessed.box({
         parent: walletWindow,
@@ -873,14 +904,16 @@ function drawWalletWindow(fileName, password) {
     }
 
     // delete log file if currently present
-    if(fs.existsSync(`${fileName}.log`)) {
+    if (fs.existsSync(`${fileName}.log`)) {
         fs.unlinkSync(`${fileName}.log`);
     };
 
     // configure logging
     wallet.setLogLevel(WB.LogLevel.DEBUG);
     wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
-        let logStream = fs.createWriteStream(`${fileName}.log`, {flags: 'a'});
+        let logStream = fs.createWriteStream(`${fileName}.log`, {
+            flags: 'a'
+        });
         logStream.write(prettyMessage + '\n');
     });
 
@@ -1002,6 +1035,148 @@ function drawWalletWindow(fileName, password) {
         data: txArray
     })
 
+    // TRANSFER WINDOW ----------------------------------------------------------------------------
+
+    // create the opening menu
+    let transferForm = blessed.form({
+        parent: transferWindow,
+        keys: true,
+        left: 'center',
+        top: '5%',
+        width: 42,
+        height: 15,
+        bg: 'black',
+        fg: 'red',
+        border: {
+            type: 'line',
+            fg: 'white'
+        }
+    });
+
+    // define filename textbox label
+    let transferFormLabel = blessed.text({
+        parent: transferForm,
+        top: -1,
+        left: 'center',
+        fg: 'white',
+        content: 'Send TRTL'
+    });
+
+    // define filename textbox label
+    let addressLabel = blessed.text({
+        parent: transferForm,
+        top: 0,
+        left: 0,
+        fg: 'white',
+        content: 'Address:'
+    });
+
+    // define filename textbox
+    let addressInput = blessed.textbox({
+        parent: transferForm,
+        name: 'address',
+        top: 1,
+        left: 0,
+        width: 40   ,
+        mouse: true,
+        inputOnFocus: true,
+        keys: true,
+        height: 3,
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // define password textbox label
+    let idLabel = blessed.text({
+        parent: transferForm,
+        top: 4,
+        left: 0,
+        fg: 'white',
+        content: 'Payment ID: (optional)'
+    });
+
+    // defind password textbox
+    let idInput = blessed.textbox({
+        parent: transferForm,
+        name: 'paymentid',
+        top: 5,
+        left: 0,
+        width: 40,
+        mouse: true,
+        inputOnFocus: true,
+        keys: true,
+        height: 3,
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // define password textbox label
+    let amountLabel = blessed.text({
+        parent: transferForm,
+        top: 8,
+        left: 0,
+        fg: 'white',
+        content: 'Amount:'
+    });
+
+    // defind password textbox
+    let amountInput = blessed.textbox({
+        parent: transferForm,
+        name: 'paymentid',
+        top: 9,
+        left: 0,
+        width: 20,
+        mouse: true,
+        inputOnFocus: true,
+        keys: true,
+        height: 3,
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    let availableBalanceText = blessed.text({
+        parent: transferForm,
+        top: 9,
+        left: 22,
+        fg: 'white',
+        tags: true,
+        content: `{bold}Available:{/}\n${WB.prettyPrintAmount(walletBalanceData[0])}`
+    })
+
+    // define submit button
+    let transferButton = blessed.button({
+        parent: transferForm,
+        mouse: true,
+        keys: true,
+        shrink: true,
+        tags: true,
+        padding: {
+            left: 14,
+            right: 14
+        },
+        left: 0,
+        top: 12,
+        shrink: true,
+        name: 'sendtransfer',
+        content: 'send (enter)',
+        style: {
+            bg: 'black',
+            fg: 'white',
+            hover: {
+                bg: 'red'
+            }
+        }
+    });
+
     //allow control the table with the keyboard
     // transactionTable.focus()
     screen.render();
@@ -1013,6 +1188,24 @@ function drawWalletWindow(fileName, password) {
         walletWindow.destroy();
         navBar.destroy();
         drawSplashScreen();
+    })
+
+    // t keypress
+    walletWindow.key(['t'], function(ch, key) {
+        transferWindow.setFront();
+        screen.render();
+    })
+
+    // t keypress
+    walletWindow.key(['s'], function(ch, key) {
+        settingsWindow.setFront();
+        screen.render();
+    })
+
+    walletWindow.key(['w'], function(ch, key) {
+        // draw the window
+        walletWindow.setFront();
+        screen.render();
     })
 
     // quit on top right button
