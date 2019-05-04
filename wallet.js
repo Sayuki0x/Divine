@@ -123,14 +123,14 @@ function drawSplashScreen() {
 
     // keyboard commands for PRESS START
     splashWindow.key(['enter'], function(ch, key) {
-            splashWindow.destroy();
-            navBar.destroy();
-            drawStartWindow();
+        splashWindow.destroy();
+        navBar.destroy();
+        drawStartWindow();
     })
 
     splashWindow.key(['x'], function(ch, key) {
         return process.exit(0);
-})
+    })
 
     // quit on top right button
     closeWalletButton.on('press', function() {
@@ -299,7 +299,7 @@ function drawStartWindow() {
         startWindow.destroy();
         navBar.destroy();
         drawCreateWindow();
-    })  
+    })
 
     startWindow.key(['x'], function(ch, key) {
         startWindow.destroy();
@@ -312,7 +312,7 @@ function drawStartWindow() {
         startWindow.destroy();
         navBar.destroy();
         drawOpenWindow();
-    }); 
+    });
 
     // if create button is pressed
     createWalletButton.on('press', function() {
@@ -490,7 +490,7 @@ function drawOpenWindow() {
         openWindow.destroy();
         navBar.destroy();
         screen.render();
-    })  
+    })
 
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
@@ -498,7 +498,7 @@ function drawOpenWindow() {
         openWindow.destroy();
         navBar.destroy();
         screen.render();
-    })  
+    })
 
     // enter keypress
     password.key(['enter'], function(ch, key) {
@@ -506,7 +506,7 @@ function drawOpenWindow() {
         openWindow.destroy();
         navBar.destroy();
         screen.render();
-    })  
+    })
 
     // x keypress
     openWindow.key(['x'], function(ch, key) {
@@ -776,7 +776,7 @@ function drawWalletWindow(fileName, password) {
         content: '(w)allet',
         style: {
             bg: 'red',
-            fg: 'white',    
+            fg: 'white',
             hover: {
                 bg: 'red',
                 fg: 'white'
@@ -963,9 +963,9 @@ function drawWalletWindow(fileName, password) {
     walletWindow.focus();
     screen.render();
 
-    let transactionTable = contrib.table({ 
+    let transactionTable = contrib.table({
         parent: rightColumn,
-        keys: true, 
+        keys: true,
         bg: 'black',
         fg: 'grey',
         selectedFg: 'white',
@@ -974,13 +974,18 @@ function drawWalletWindow(fileName, password) {
         label: 'Recent Transactions',
         width: '100%',
         height: '100%',
-        border: {type: "line", fg: "white"},
+        border: {
+            type: "line",
+            fg: "white"
+        },
         columnSpacing: 6,
-        columnWidth: [18, 20] })
+        columnWidth: [18, 20]
+    })
 
-    transactionTable.setData(
-    { headers: ['Time', 'Amount']
-    , data: txArray})
+    transactionTable.setData({
+        headers: ['Time', 'Amount'],
+        data: txArray
+    })
 
     //allow control the table with the keyboard
     // transactionTable.focus()
@@ -1029,12 +1034,13 @@ function drawWalletWindow(fileName, password) {
             `{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
 
         let updateTransactionList = wallet.getTransactions();
-        
+
         const updateTxArray = getRecentTransactions(updateTransactionList);
 
-        transactionTable.setData(
-            { headers: ['Time', 'Amount']
-            , data: updateTxArray})
+        transactionTable.setData({
+            headers: ['Time', 'Amount'],
+            data: updateTxArray
+        })
 
         // render the screen
         screen.render();
@@ -1131,14 +1137,14 @@ function getRecentTransactions(walletData) {
 
 // convert unix timestamp into human readable
 function convertTimestamp(timestamp) {
-    let d = new Date(timestamp * 1000),	// Convert the passed timestamp to milliseconds
-          yyyy = d.getFullYear(),
-          mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
-          dd = ('0' + d.getDate()).slice(-2),			// Add leading 0.
-          hh = ('0' + d.getHours()).slice(-2),
-          min = ('0' + d.getMinutes()).slice(-2),		// Add leading 0.
-          time;
-      // ie: 2013-02-18, 16:35	
-      time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
-      return time;
-  }
+    let d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
+        yyyy = d.getFullYear(),
+        mm = ('0' + (d.getMonth() + 1)).slice(-2), // Months are zero based. Add leading 0.
+        dd = ('0' + d.getDate()).slice(-2), // Add leading 0.
+        hh = ('0' + d.getHours()).slice(-2),
+        min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
+        time;
+    // ie: 2013-02-18, 16:35	
+    time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
+    return time;
+}
