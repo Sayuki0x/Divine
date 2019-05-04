@@ -872,6 +872,11 @@ function drawWalletWindow(fileName, password) {
         errorPrinter.setContent('Error opening wallet...');
     }
 
+    // delete log file if currently present
+    if(fs.existsSync(`${fileName}.log`)) {
+        fs.unlinkSync(`${fileName}.log`);
+    };
+
     // configure logging
     wallet.setLogLevel(WB.LogLevel.DEBUG);
     wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
