@@ -4,11 +4,12 @@
 ///////////////////////////////////////////////////////////////
 
 // requires
-const WB = require('turtlecoin-wallet-backend');
-const clipboardy = require('clipboardy');
-const blessed = require('blessed');
-const contrib = require('blessed-contrib');
-const fs = require('fs');
+import WB = require('turtlecoin-wallet-backend');
+import clipboardy = require('clipboardy');
+import blessed = require('blessed');
+import contrib = require('blessed-contrib');
+import fs from 'fs';
+
 let walletLogStream = fs.createWriteStream(`divinewallet.log`, {
     flags: 'a'
 });
@@ -108,7 +109,7 @@ function drawSplashScreen() {
         }
     });
 
-    // set text fields for start screen 
+    // set text fields for start screen
     let asciiArt = blessed.text({
         parent: splashText,
         top: '10%',
@@ -661,7 +662,7 @@ function drawCreateWindow() {
         top: 5,
         left: 0,
         width: 33,
-        mouse: false,
+        // mouse: false,
         inputOnFocus: true,
         vi: false,
         keys: true,
@@ -692,7 +693,7 @@ function drawCreateWindow() {
         },
         left: 0,
         top: 8,
-        shrink: true,
+        // shrink: true,
         name: 'openwallet',
         content: 'create wallet (enter)',
         style: {
@@ -729,7 +730,7 @@ function drawWalletWindow(fileName, password) {
     if (fs.existsSync(`${fileName}.log`)) {
         fs.unlinkSync(`${fileName}.log`);
     };
-    
+
     // define and start the wallet
     const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
     if (error) {
@@ -903,7 +904,7 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: '97%',
         top: '0%',
-        shrink: true,
+        // shrink: true,
         name: 'close',
         content: '(x)',
         style: {
@@ -937,7 +938,7 @@ function drawWalletWindow(fileName, password) {
         },
         left: 0,
         top: '0%',
-        shrink: true,
+        // shrink: true,
         name: 'wallet',
         content: '(w)allet',
         style: {
@@ -970,7 +971,7 @@ function drawWalletWindow(fileName, password) {
         },
         left: 11,
         top: '0%',
-        shrink: true,
+        // shrink: true,
         name: 'transfer',
         content: '(t)ransfer',
         style: {
@@ -1002,7 +1003,7 @@ function drawWalletWindow(fileName, password) {
         },
         left: 22,
         top: '0%',
-        shrink: true,
+        // shrink: true,
         name: 'settings',
         content: '(s)ettings',
         style: {
@@ -1056,7 +1057,7 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: 0,
         top: 0,
-        shrink: true,
+        // shrink: true,
         name: 'address',
         content: addressString,
         style: {
@@ -1153,18 +1154,18 @@ function drawWalletWindow(fileName, password) {
     });
 
     let transactionTable = contrib.table({
-        parent: rightColumn,
+        // parent: rightColumn,
         bg: 'black',
         fg: 'grey',
         selectedFg: 'white',
         selectedBg: 'black',
-        label: 'Recent Transactions',
-        width: '100%',
-        height: '100%',
-        border: {
-            type: "line",
-            fg: "white"
-        },
+        // label: 'Recent Transactions',
+        // width: '100%',
+        // height: '100%',
+        // border: {
+        //     type: "line",
+        //     fg: "white"
+        // },
         columnSpacing: 6,
         columnWidth: [18, 20]
     })
@@ -1466,7 +1467,7 @@ function convertTimestamp(timestamp) {
         hh = ('0' + d.getHours()).slice(-2),
         min = ('0' + d.getMinutes()).slice(-2), // Add leading 0.
         time;
-    // ie: 2013-02-18, 16:35	
+    // ie: 2013-02-18, 16:35
     time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
     return time;
 }

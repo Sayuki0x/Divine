@@ -23,6 +23,10 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 
 `npm install`
 
+4. Compile the typscript
+
+`tsc`
+
 4. Start the program
 
 `npm start`

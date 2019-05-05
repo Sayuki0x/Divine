@@ -2,16 +2,19 @@
   "name": "divinewallet",
   "version": "0.1.0",
   "description": "A TUI wallet for TurtleCoin powered by turtlecoin-wallet-backend-js, utilizing the Blessed high-level terminal interface library.",
-  "main": "wallet.js",
+  "main": "./dist/wallet.js",
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.15",
     "clipboardy": "^2.0.0",
     "turtlecoin-wallet-backend": "^1.1.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^12.0.0",
+    "typescript": "^3.5.0-dev.20190504"
+  },
   "scripts": {
-    "start": "node wallet.js"
+    "start": "node dist/wallet.js"
   },
   "repository": {
     "type": "git",
