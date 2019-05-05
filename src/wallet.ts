@@ -320,7 +320,7 @@ function drawStartWindow() {
 }
 
 // draw the open window
-function drawOpenWindow() { 
+function drawOpenWindow(error?: any) { 
 
     // draw the navbar
     let navBar = blessed.box({
@@ -330,6 +330,19 @@ function drawOpenWindow() {
         height: '10%',
         bg: 'black'
     })
+
+    // define notification text
+    let errorText = blessed.text({
+        parent: navBar,
+        top: 'center',
+        left: 'center',
+        fg: 'red',
+        content: 'test'
+    })
+
+    if(error !== undefined) {
+        errorText.setContent(error.toString());
+    }
 
     // draw the window
     let openWindow = blessed.box({
@@ -343,15 +356,16 @@ function drawOpenWindow() {
         }
     });
 
+    // focus the window
     openWindow.focus();
 
+    // pop focus on click
     openWindow.on('click', function() {
         screen.focusPop();
         openWindow.focus();
     });
 
     // enter keypress
-
     openWindow.key(['enter'], function(ch, key) {
         openForm.submit();
         openWindow.destroy();
@@ -413,7 +427,10 @@ function drawOpenWindow() {
 
     // open form post handling
     openForm.on('submit', function(data) {
-        drawWalletWindow(data.filename, data.password)
+        const error = drawWalletWindow(data.filename, data.password);
+        if (error) {
+            drawOpenWindow(error);
+        }
     });
 
     // define filename textbox label
@@ -1495,10 +1512,7 @@ function createWallet(fileName, password) {
     const wallet = WB.WalletBackend.createWallet(daemon);
     wallet.saveWalletToFile(`${fileName}.wallet`, password);
     wallet.stop();
-    let error = drawWalletWindow(fileName, password);
-    if (error) {
-        logFile('Reached the error callback!');
-    } 
+    drawWalletWindow(fileName, password);
 }
 
 // refresh the sync bar
