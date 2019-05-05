@@ -758,15 +758,11 @@ function drawWalletWindow(fileName, password) {
     // WALLET CODE
     ///////////////////////////////////////////////////////////////////
 
-    // delete log file if currently present
-    if (fs.existsSync(`${fileName}.log`)) {
-        fs.unlinkSync(`${fileName}.log`);
-    };
-
     // define and start the wallet
     const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
     if (error) {
         logFile(error);
+        return error;
     }
 
     // configure logging
@@ -777,6 +773,11 @@ function drawWalletWindow(fileName, password) {
         });
         logStream.write(prettyMessage + '\n');
     });
+
+    // delete log file if currently present
+    if (fs.existsSync(`${fileName}.log`)) {
+        fs.unlinkSync(`${fileName}.log`);
+    };
 
     // start the wallet
     wallet.start();
@@ -1306,6 +1307,15 @@ function drawWalletWindow(fileName, password) {
     addressInput.on('blur', function() {
         screen.focusPop();
     })
+
+    addressInput.key('enter', function() {
+        screen.focusPop();
+        transferForm.submit();
+        transferForm.reset();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    });
     
 
     // define password textbox label
@@ -1341,7 +1351,16 @@ function drawWalletWindow(fileName, password) {
 
     idInput.on('blur', function() {
         screen.focusPop();
-    })
+    });
+
+    idInput.key('enter', function() {
+        screen.focusPop();
+        transferForm.submit();
+        transferForm.reset();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    });
 
     // define password textbox label
     let amountLabel = blessed.text({
@@ -1378,6 +1397,15 @@ function drawWalletWindow(fileName, password) {
         screen.focusPop();
     })
 
+    amountInput.key('enter', function() {
+        screen.focusPop();
+        transferForm.submit();
+        transferForm.reset();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    });
+
     let availableBalanceText = blessed.text({
         parent: transferForm,
         top: 9,
@@ -1412,6 +1440,7 @@ function drawWalletWindow(fileName, password) {
     transferButton.on('press', function() {
         screen.focusPop();
         transferForm.submit();
+        transferForm.reset();
         walletWindow.setFront();
         walletWindow.focus();
         screen.render();
@@ -1457,6 +1486,8 @@ function drawWalletWindow(fileName, password) {
     walletWindow.focus();
     screen.render();
 
+    return undefined;
+
 }
 
 // create new wallet and launch it
@@ -1464,7 +1495,10 @@ function createWallet(fileName, password) {
     const wallet = WB.WalletBackend.createWallet(daemon);
     wallet.saveWalletToFile(`${fileName}.wallet`, password);
     wallet.stop();
-    drawWalletWindow(fileName, password);
+    let error = drawWalletWindow(fileName, password);
+    if (error) {
+        logFile('Reached the error callback!');
+    } 
 }
 
 // refresh the sync bar
@@ -1513,6 +1547,7 @@ function humanReadable(amount) {
     return (amount / 100).toFixed(2);
 }
 
+// convert human readable amounts to atomic units
 function atomicUnits(amount) {
     return (amount * 100);
 }
