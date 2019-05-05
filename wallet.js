@@ -9,6 +9,9 @@ const clipboardy = require('clipboardy');
 const blessed = require('blessed');
 const contrib = require('blessed-contrib');
 const fs = require('fs');
+let walletLogStream = fs.createWriteStream(`divinewallet.log`, {
+    flags: 'a'
+});
 let wallet;
 
 // set daemon
@@ -17,7 +20,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.0.3'
+    title: 'DivineWallet v0.1.0'
 });
 
 // run the initial function
@@ -32,7 +35,6 @@ function drawSplashScreen() {
         left: 0,
         width: '100%',
         height: '10%'
-        // bg: 'black'
     })
 
     // draw the window
@@ -41,12 +43,29 @@ function drawSplashScreen() {
         left: '0%',
         width: '100%',
         height: '100%',
-        tags: true,
         style: {
-            fg: 'white',
-            bg: 'black',
+            fg: 'white'
         }
     });
+
+    // on click for splashwindow
+    splashWindow.on('click', function() {
+        splashWindow.destroy();
+        navBar.destroy();
+        drawStartWindow();
+    })
+
+    // keyboard commands for PRESS START
+    splashWindow.key(['enter'], function(ch, key) {
+        splashWindow.destroy();
+        navBar.destroy();
+        drawStartWindow();
+    })
+
+    // x command
+    splashWindow.key(['x'], function(ch, key) {
+        return process.exit(0);
+    })
 
     // append the areas
     screen.append(navBar);
@@ -56,12 +75,9 @@ function drawSplashScreen() {
     let closeWalletButton = blessed.button({
         parent: navBar,
         mouse: true,
-        keys: true,
         shrink: true,
         left: '97%',
         top: '0%',
-        shrink: true,
-        name: 'close',
         content: '(x)',
         style: {
             bg: 'black',
@@ -71,6 +87,11 @@ function drawSplashScreen() {
                 fg: 'white'
             }
         }
+    })
+
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        return process.exit(0);
     })
 
     // set ascii art column
@@ -94,7 +115,6 @@ function drawSplashScreen() {
         left: 'center',
         width: '100%',
         fg: 'red',
-        tags: true
     })
     let welcomeMessage = blessed.text({
         parent: splashText,
@@ -117,32 +137,9 @@ function drawSplashScreen() {
     )
     welcomeMessage.setContent('{bold}PRESS START{/}');
 
+    // rfocus the window and ender the screen
     splashWindow.focus();
-
-    // render the screen
     screen.render();
-
-    // keyboard commands for PRESS START
-    splashWindow.key(['enter'], function(ch, key) {
-        splashWindow.destroy();
-        navBar.destroy();
-        drawStartWindow();
-    })
-
-    splashWindow.key(['x'], function(ch, key) {
-        return process.exit(0);
-    })
-
-    // quit on top right button
-    closeWalletButton.on('press', function() {
-        return process.exit(0);
-    })
-
-    splashWindow.on('click', function() {
-        splashWindow.destroy();
-        navBar.destroy();
-        drawStartWindow();
-    })
 
 }
 
@@ -164,129 +161,11 @@ function drawStartWindow() {
         left: '0%',
         width: '100%',
         height: '100%',
-        tags: true,
         style: {
             fg: 'white',
             bg: 'black',
         }
     });
-
-    // Append our welcomeScreen to the screen.
-    screen.append(navBar);
-    screen.append(startWindow);
-
-    // create the opening menu
-    let startForm = blessed.form({
-        parent: startWindow,
-        keys: true,
-        left: 'center',
-        top: '30%',
-        width: 15,
-        height: 5,
-        bg: 'black',
-        fg: 'red',
-        border: {
-            type: 'line',
-            fg: 'white'
-        }
-    });
-
-    // define the close button
-    let closeWalletButton = blessed.button({
-        parent: navBar,
-        mouse: true,
-        keys: true,
-        shrink: true,
-        left: '97%',
-        top: '0%',
-        shrink: true,
-        name: 'close',
-        content: '(x)',
-        style: {
-            bg: 'black',
-            fg: 'red',
-            hover: {
-                bg: 'red',
-                fg: 'white'
-            }
-        }
-    })
-
-    // define the "open wallet" button
-    let openWalletButton = blessed.button({
-        parent: startForm,
-        mouse: true,
-        keys: true,
-        shrink: true,
-        padding: {
-            left: 2,
-            right: 5
-        },
-        left: 0,
-        top: 0,
-        shrink: true,
-        name: 'open',
-        content: '(o)pen',
-        style: {
-            bg: 'black',
-            fg: 'white',
-            hover: {
-                bg: 'red'
-            }
-        }
-    });
-
-    // define the "create wallet" button
-    let createWalletButton = blessed.button({
-        parent: startForm,
-        mouse: true,
-        keys: true,
-        shrink: true,
-        padding: {
-            left: 2,
-            right: 3
-        },
-        left: 0,
-        top: 1,
-        shrink: true,
-        name: 'create',
-        content: '(c)reate',
-        style: {
-            bg: 'black',
-            fg: 'white',
-            hover: {
-                bg: 'red'
-            }
-        }
-    });
-
-    // define the "import wallet" button
-    let importWalletButton = blessed.button({
-        parent: startForm,
-        mouse: true,
-        keys: true,
-        shrink: true,
-        padding: {
-            left: 2,
-            right: 3
-        },
-        left: 0,
-        top: 2,
-        shrink: true,
-        name: 'import',
-        content: '(i)mport',
-        style: {
-            bg: 'black',
-            fg: 'white',
-            hover: {
-                bg: 'red'
-            }
-        }
-    });
-
-    // focus window and render screen
-    startWindow.focus();
-    screen.render();
 
     // o keypress
     startWindow.key(['o'], function(ch, key) {
@@ -308,19 +187,44 @@ function drawStartWindow() {
         drawSplashScreen();
     })
 
-    // if open button is pressed
-    openWalletButton.on('press', function() {
-        startWindow.destroy();
-        navBar.destroy();
-        drawOpenWindow();
+    // Append our welcomeScreen to the screen.
+    screen.append(navBar);
+    screen.append(startWindow);
+
+    // create the opening menu
+    let startForm = blessed.form({
+        parent: startWindow,
+        left: 'center',
+        top: '30%',
+        width: 15,
+        height: 5,
+        bg: 'black',
+        fg: 'red',
+        border: {
+            type: 'line',
+            fg: 'white'
+        }
     });
 
-    // if create button is pressed
-    createWalletButton.on('press', function() {
-        startWindow.destroy();
-        navBar.destroy();
-        drawCreateWindow();
+    // define the close button
+    let closeWalletButton = blessed.button({
+        parent: navBar,
+        mouse: true,
+        shrink: true,
+        left: '97%',
+        top: '0%',
+        name: 'close',
+        content: '(x)',
+        style: {
+            bg: 'black',
+            fg: 'red',
+            hover: {
+                bg: 'red',
+                fg: 'white'
+            }
+        }
     })
+
 
     // quit on top right button
     closeWalletButton.on('press', function() {
@@ -329,7 +233,89 @@ function drawStartWindow() {
         drawSplashScreen();
     })
 
-    // initial render
+    // define the "open wallet" button
+    let openWalletButton = blessed.button({
+        parent: startForm,
+        mouse: true,
+        shrink: true,
+        padding: {
+            left: 2,
+            right: 5
+        },
+        left: 0,
+        top: 0,
+        name: 'open',
+        content: '(o)pen',
+        style: {
+            bg: 'black',
+            fg: 'white',
+            hover: {
+                bg: 'red'
+            }
+        }
+    });
+
+    // if open button is pressed
+    openWalletButton.on('press', function() {
+        startWindow.destroy();
+        navBar.destroy();
+        drawOpenWindow();
+    });
+
+    // define the "create wallet" button
+    let createWalletButton = blessed.button({
+        parent: startForm,
+        mouse: true,
+        shrink: true,
+        padding: {
+            left: 2,
+            right: 3
+        },
+        left: 0,
+        top: 1,
+        name: 'create',
+        content: '(c)reate',
+        style: {
+            bg: 'black',
+            fg: 'white',
+            hover: {
+                bg: 'red'
+            }
+        }
+    });
+
+    // if create button is pressed
+    createWalletButton.on('press', function() {
+        screen.focusPop();
+        startWindow.destroy();
+        navBar.destroy();
+        drawCreateWindow();
+    })
+
+    // define the "import wallet" button
+    let importWalletButton = blessed.button({
+        parent: startForm,
+        mouse: true,
+        shrink: true,
+        padding: {
+            left: 2,
+            right: 3
+        },
+        left: 0,
+        top: 2,
+        name: 'import',
+        content: '(i)mport',
+        style: {
+            bg: 'black',
+            fg: 'white',
+            hover: {
+                bg: 'red'
+            }
+        }
+    });
+
+    // focus window and render screen
+    startWindow.focus();
     screen.render();
 }
 
@@ -351,12 +337,30 @@ function drawOpenWindow() {
         left: '0%',
         width: '100%',
         height: '100%',
-        tags: true,
         style: {
             fg: 'white',
             bg: 'black',
         }
     });
+
+    openWindow.on('click', function() {
+        screen.focusPop();
+    });
+
+    // enter keypress
+    openWindow.key(['enter'], function(ch, key) {
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })
+
+    // x keypress
+    openWindow.key(['x'], function(ch, key) {
+        openWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
 
     // append the elements to the screen
     screen.append(openWindow);
@@ -366,11 +370,9 @@ function drawOpenWindow() {
     let closeWalletButton = blessed.button({
         parent: navBar,
         mouse: true,
-        keys: true,
         shrink: true,
         left: '97%',
         top: '0%',
-        shrink: true,
         name: 'close',
         content: '(x)',
         style: {
@@ -383,10 +385,15 @@ function drawOpenWindow() {
         }
     })
 
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        openWindow.destroy();
+        drawSplashScreen();
+    })
+
     // define "open wallet" info form
     let openForm = blessed.form({
         parent: openWindow,
-        keys: true,
         left: 'center',
         top: '20%',
         width: 35,
@@ -399,9 +406,15 @@ function drawOpenWindow() {
         }
     });
 
+    // open form post handling
+    openForm.on('submit', function(data) {
+        drawWalletWindow(data.filename, data.password)
+    });
+
     // define filename textbox label
     let openLabel = blessed.text({
         parent: openForm,
+        keys: true,
         top: 0,
         left: 0,
         fg: 'white',
@@ -412,12 +425,12 @@ function drawOpenWindow() {
     let fileName = blessed.textbox({
         parent: openForm,
         name: 'filename',
+        mouse: true,
+        keys: true,
         top: 1,
         left: 0,
         width: 33,
-        mouse: true,
         inputOnFocus: true,
-        keys: true,
         height: 3,
         content: 'first',
         border: {
@@ -426,6 +439,20 @@ function drawOpenWindow() {
         },
         fg: 'white',
     });
+
+    fileName.on('click', function() {
+        screen.focusPop();
+        screen.render();
+    });
+
+    // enter keypress
+    fileName.key(['enter'], function(ch, key) {
+        screen.focusPop();
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })
 
     // define password textbox label
     let openPasswordLabel = blessed.text({
@@ -440,12 +467,12 @@ function drawOpenWindow() {
     let password = blessed.textbox({
         parent: openForm,
         name: 'password',
+        mouse: true,
+        keys: true,
         top: 5,
         left: 0,
         width: 33,
-        mouse: true,
         inputOnFocus: true,
-        keys: true,
         censor: true,
         height: 3,
         content: 'first',
@@ -456,20 +483,29 @@ function drawOpenWindow() {
         fg: 'white',
     });
 
+    password.on('click', function() {
+        screen.focusPop();
+    });
+
+    // enter keypress
+    password.key(['enter'], function(ch, key) {
+        openForm.submit();
+        openWindow.destroy();
+        navBar.destroy();
+        screen.render();
+    })
+
     // define submit button
     let openWalletButton = blessed.button({
         parent: openForm,
         mouse: true,
-        keys: true,
         shrink: true,
-        tags: true,
         padding: {
             left: 7,
             right: 7
         },
         left: 0,
         top: 8,
-        shrink: true,
         name: 'openwallet',
         content: 'open wallet (enter)',
         style: {
@@ -481,60 +517,17 @@ function drawOpenWindow() {
         }
     });
 
-    // render the screen
-    fileName.focus();
-    screen.render();
-
-    // enter keypress
-    openWindow.key(['enter'], function(ch, key) {
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
-        screen.render();
-    })
-
-    // enter keypress
-    fileName.key(['enter'], function(ch, key) {
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
-        screen.render();
-    })
-
-    // enter keypress
-    password.key(['enter'], function(ch, key) {
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
-        screen.render();
-    })
-
-    // x keypress
-    openWindow.key(['x'], function(ch, key) {
-        openWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
-    })
-
     // on submit button press
     openWalletButton.on('press', function() {
         openForm.submit();
+        openForm.destroy();
         openWindow.destroy();
         navBar.destroy();
-        screen.render();
     });
 
-    // open form post handling
-    openForm.on('submit', function(data) {
-        drawWalletWindow(data.filename, data.password)
-    });
-
-    // quit on top right button
-    closeWalletButton.on('press', function() {
-        openWindow.destroy();
-        drawSplashScreen();
-    })
-
+    // render the screen
+    fileName.focus();
+    screen.render();
 
 }
 
@@ -556,11 +549,14 @@ function drawCreateWindow() {
         left: '0%',
         width: '100%',
         height: '100%',
-        tags: true,
         style: {
             fg: 'white',
             bg: 'black',
         }
+    });
+
+    createWindow.on('click', function() {
+        screen.focusPop();
     });
 
     // append elements to screen instance
@@ -571,11 +567,9 @@ function drawCreateWindow() {
     let closeWalletButton = blessed.button({
         parent: navBar,
         mouse: true,
-        keys: true,
         shrink: true,
         left: '97%',
         top: '0%',
-        shrink: true,
         name: 'close',
         content: '(x)',
         style: {
@@ -588,12 +582,19 @@ function drawCreateWindow() {
         }
     })
 
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        createWindow.destroy();
+        drawSplashScreen();
+    })
+
     // define open wallet form
     let createForm = blessed.form({
         parent: createWindow,
-        keys: true,
         left: 'center',
         top: '20%',
+        keys: true,
+        mouse: true,
         width: 35,
         height: 11,
         bg: 'black',
@@ -603,6 +604,12 @@ function drawCreateWindow() {
             fg: 'white'
         }
     });
+
+    // create form post handling
+    createForm.on('submit', function(data) {
+        createWallet(data.filename, data.password);
+    });
+
 
     // define filename textbox label
     let createLabel = blessed.text({
@@ -617,12 +624,13 @@ function drawCreateWindow() {
     let fileName = blessed.textbox({
         parent: createForm,
         name: 'filename',
+        mouse: true,
+        keys: true,
         top: 1,
         left: 0,
         width: 33,
-        mouse: true,
         inputOnFocus: true,
-        keys: true,
+        vi: false,
         height: 3,
         content: 'first',
         border: {
@@ -632,8 +640,12 @@ function drawCreateWindow() {
         fg: 'white',
     });
 
+    fileName.on('click', function() {
+        screen.focusPop();
+    });
+
     // define password textbox label
-    let openPasswordLabel = blessed.text({
+    let createPasswordLabel = blessed.text({
         parent: createForm,
         top: 4,
         left: 0,
@@ -645,11 +657,13 @@ function drawCreateWindow() {
     let password = blessed.textbox({
         parent: createForm,
         name: 'password',
+        mouse: true,
         top: 5,
         left: 0,
         width: 33,
-        mouse: true,
+        mouse: false,
         inputOnFocus: true,
+        vi: false,
         keys: true,
         censor: true,
         height: 3,
@@ -659,6 +673,10 @@ function drawCreateWindow() {
             fg: 'grey'
         },
         fg: 'white',
+    });
+
+    password.on('click', function() {
+        screen.focusPop();
     });
 
     // define create form submit button
@@ -686,9 +704,6 @@ function drawCreateWindow() {
         }
     });
 
-    // render the screen
-    screen.render();
-
     // on create wallet button press
     createWalletButton.on('press', function() {
         createForm.submit();
@@ -697,23 +712,54 @@ function drawCreateWindow() {
         screen.render();
     });
 
-    // create form post handling
-    createForm.on('submit', function(data) {
-        createWallet(data.filename, data.password);
-    });
+    // render the screen
+    screen.render();
 
-    // quit on top right button
-    closeWalletButton.on('press', function() {
-        createWindow.destroy();
-        drawSplashScreen();
-    })
 
 }
 
 // draw the wallet window
 function drawWalletWindow(fileName, password) {
 
-    // draw the navbar
+    ///////////////////////////////////////////////////////////////////
+    // WALLET CODE
+    ///////////////////////////////////////////////////////////////////
+
+    // delete log file if currently present
+    if (fs.existsSync(`${fileName}.log`)) {
+        fs.unlinkSync(`${fileName}.log`);
+    };
+    
+    // define and start the wallet
+    const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
+    if (error) {
+        logFile(error);
+    }
+
+    // configure logging
+    wallet.setLogLevel(WB.LogLevel.DEBUG);
+    wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
+        let logStream = fs.createWriteStream(`${fileName}.log`, {
+            flags: 'a'
+        });
+        logStream.write(prettyMessage + '\n');
+    });
+
+    // start the wallet
+    wallet.start();
+
+    // get transaction data
+    const txData = wallet.getTransactions();
+    const txArray = getRecentTransactions(txData)
+
+    // get the wallet address
+    const addressString = wallet.getPrimaryAddress();
+
+    ///////////////////////////////////////////////////////////////////
+    // UI CODE
+    ///////////////////////////////////////////////////////////////////
+
+    // draw all of the windows
     let navBar = blessed.box({
         top: 0,
         left: 0,
@@ -734,6 +780,27 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    transferWindow.on('click', function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    // t keypress
+    transferWindow.key(['s'], function(ch, key) {
+        screen.focusPop();
+        settingsWindow.setFront();
+        settingsWindow.focus();
+        screen.render();
+    })
+
+    transferWindow.key(['w'], function(ch, key) {
+        // draw the window
+        screen.focusPop();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    })
+
     let settingsWindow = blessed.box({
         top: '10%',
         left: '0%',
@@ -745,6 +812,31 @@ function drawWalletWindow(fileName, password) {
             bg: 'black',
         }
     });
+
+    // t keypress
+    settingsWindow.key(['t'], function(ch, key) {
+        screen.focusPop();
+        transferWindow.setFront();
+        addressInput.focus();
+        screen.render();
+    })
+
+    // s keypress
+    settingsWindow.key(['s'], function(ch, key) {
+        screen.focusPop();
+        settingsWindow.setFront();
+        settingsWindow.focus();
+        screen.render();
+    })
+
+    // w keypress
+    settingsWindow.key(['w'], function(ch, key) {
+        // draw the window
+        screen.focusPop();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    })
 
     // draw the window
     let walletWindow = blessed.box({
@@ -759,13 +851,49 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    // x keypress
+    walletWindow.key(['x'], function(ch, key) {
+        wallet.saveWalletToFile(`${fileName}.wallet`, password);
+        wallet.stop();
+        walletWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
+    // t keypress
+    walletWindow.key(['t'], function(ch, key) {
+        screen.focusPop();
+        transferWindow.setFront();
+        addressInput.focus();
+        screen.render();
+    })
+
+    // t keypress
+    walletWindow.key(['s'], function(ch, key) {
+        screen.focusPop();
+        settingsWindow.setFront();
+        settingsWindow.focus();
+        screen.render();
+    })
+
+    walletWindow.key(['w'], function(ch, key) {
+        // draw the window
+        screen.focusPop();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    })
+
     // append the elements
+    walletWindow.focus();
     screen.append(navBar);
     screen.append(transferWindow);
     screen.append(settingsWindow);
     screen.append(walletWindow);
 
-    // NAV BAR ----------------------------------------------------------------------------
+    ///////////////////////////////////////////////////////////////////
+    // NAVIGATION BAR
+    ///////////////////////////////////////////////////////////////////
 
     // render the X button
     let closeWalletButton = blessed.button({
@@ -786,6 +914,15 @@ function drawWalletWindow(fileName, password) {
                 fg: 'white'
             }
         }
+    })
+
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        wallet.saveWalletToFile(`${fileName}.wallet`, password);
+        wallet.stop();
+        walletWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
     })
 
     // define wallet button
@@ -813,6 +950,14 @@ function drawWalletWindow(fileName, password) {
         }
     })
 
+    walletNavButton.on('press', function() {
+        // draw the window
+        screen.focusPop();
+        walletWindow.setFront();
+        walletWindow.focus();
+        screen.render();
+    })
+
     // define transfers button
     let transferNavButton = blessed.button({
         parent: navBar,
@@ -836,6 +981,13 @@ function drawWalletWindow(fileName, password) {
                 fg: 'white'
             }
         }
+    })
+
+    transferNavButton.on('press', function() {
+        screen.focusPop();
+        transferWindow.setFront();
+        addressInput.focus();
+        screen.render();
     })
 
     // define settings button
@@ -863,10 +1015,19 @@ function drawWalletWindow(fileName, password) {
         }
     })
 
-    // WALLET WINDOW ----------------------------------------------------------------------------
+    settingsNavButton.on('press', function() {
+        screen.focusPop();
+        settingsWindow.setFront();
+        settingsWindow.focus();
+        screen.render();
+    })
+
+    ///////////////////////////////////////////////////////////////////
+    //  WALLET WINDOW
+    //////////////////////////////////////////////////////////////////
 
 
-    // define left column
+    //////////////////////////////////// LEFT COLUMN CODE STARTS HERE
     let leftColumn = blessed.box({
         parent: walletWindow,
         top: 0,
@@ -884,44 +1045,8 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
-    // define error printer
-    let errorPrinter = blessed.text({
-        parent: leftColumn,
-        top: '50%',
-        left: '0%',
-        fg: 'white',
-        tags: true,
-        // content: 'Error opening wallet...',
-        style: {
-            fg: 'white',
-        }
-    });
 
-    // define and start the wallet
-    const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `${fileName}.wallet`, password);
-    if (error) {
-        errorPrinter.setContent('Error opening wallet...');
-    }
 
-    // delete log file if currently present
-    if (fs.existsSync(`${fileName}.log`)) {
-        fs.unlinkSync(`${fileName}.log`);
-    };
-
-    // configure logging
-    wallet.setLogLevel(WB.LogLevel.DEBUG);
-    wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
-        let logStream = fs.createWriteStream(`${fileName}.log`, {
-            flags: 'a'
-        });
-        logStream.write(prettyMessage + '\n');
-    });
-
-    // start the wallet
-    wallet.start();
-
-    // get the wallet address
-    const addressString = wallet.getPrimaryAddress();
 
     // define the address button
     let addressButton = blessed.button({
@@ -944,6 +1069,27 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    // on addressbutton click
+    addressButton.on('click', async function() {
+
+        // copy to clipboard
+        clipboardy.writeSync(addressString);
+
+        // define notification text
+        let notificationText = blessed.text({
+            parent: navBar,
+            top: 0,
+            left: '60%',
+            fg: 'grey',
+            content: `Copied to clipboard!`
+        })
+
+        // wait .5s and destroy the notification text
+        await sleep(500);
+        notificationText.destroy();
+
+    });
+
     // define the progress bar for sync
     let syncStatus = blessed.text({
         parent: leftColumn,
@@ -952,6 +1098,10 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
         tags: true
     });
+
+    // refresh the progress bar every second
+    refreshSync(syncStatus, wallet, walletWindow);
+    setInterval(refreshSync.bind(null, syncStatus, wallet, walletWindow), 1000);
 
     // define the wallet balance
     let walletBalance = blessed.text({
@@ -987,11 +1137,8 @@ function drawWalletWindow(fileName, password) {
         `{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
         `{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/}`);
 
-    // refresh the progress bar every second
-    refreshSync(syncStatus, wallet, walletWindow);
-    setInterval(refreshSync.bind(null, syncStatus, wallet, walletWindow), 1000);
 
-    // define right column
+    //////////////////////////////////// RIGHT COLUMN CODE STARTS HERE
     let rightColumn = blessed.box({
         parent: walletWindow,
         top: 0,
@@ -1005,20 +1152,12 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
-    let txData = wallet.getTransactions();
-    let txArray = getRecentTransactions(txData)
-
-    walletWindow.focus();
-    screen.render();
-
     let transactionTable = contrib.table({
         parent: rightColumn,
-        keys: true,
         bg: 'black',
         fg: 'grey',
         selectedFg: 'white',
         selectedBg: 'black',
-        interactive: true,
         label: 'Recent Transactions',
         width: '100%',
         height: '100%',
@@ -1035,7 +1174,9 @@ function drawWalletWindow(fileName, password) {
         data: txArray
     })
 
-    // TRANSFER WINDOW ----------------------------------------------------------------------------
+    ///////////////////////////////////////////////////////////////////
+    //  TRANSFER WINDOW
+    //////////////////////////////////////////////////////////////////
 
     // create the opening menu
     let transferForm = blessed.form({
@@ -1050,6 +1191,24 @@ function drawWalletWindow(fileName, password) {
         border: {
             type: 'line',
             fg: 'white'
+        }
+    });
+
+    transferForm.on('click', function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    // transfer form post handling
+    transferForm.on('submit', async function(data) {
+        let paymentID;
+        if (data.paymentid === '') {
+            paymentID = undefined;
+        }
+        try {
+            const [hash, error] = await wallet.sendTransactionBasic(data.address, parseInt(data.amount), paymentID);
+        } catch(err) {
+            logFile(err);
         }
     });
 
@@ -1077,16 +1236,19 @@ function drawWalletWindow(fileName, password) {
         name: 'address',
         top: 1,
         left: 0,
-        width: 40   ,
+        width: 40,
         mouse: true,
         inputOnFocus: true,
-        keys: true,
         height: 3,
         border: {
             type: 'line',
             fg: 'grey'
         },
         fg: 'white',
+    });
+
+    addressInput.on('click', function() {
+        screen.focusPop();
     });
 
     // define password textbox label
@@ -1116,6 +1278,10 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
     });
 
+    idInput.on('click', function() {
+        screen.focusPop();
+    });
+
     // define password textbox label
     let amountLabel = blessed.text({
         parent: transferForm,
@@ -1128,7 +1294,7 @@ function drawWalletWindow(fileName, password) {
     // defind password textbox
     let amountInput = blessed.textbox({
         parent: transferForm,
-        name: 'paymentid',
+        name: 'amount',
         top: 9,
         left: 0,
         width: 20,
@@ -1143,10 +1309,14 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
     });
 
+    amountInput.on('click', function() {
+        screen.focusPop();
+        });
+
     let availableBalanceText = blessed.text({
         parent: transferForm,
         top: 9,
-        left: 22,
+        left: 21,
         fg: 'white',
         tags: true,
         content: `{bold}Available:{/}\n${WB.prettyPrintAmount(walletBalanceData[0])}`
@@ -1165,7 +1335,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 0,
         top: 12,
-        shrink: true,
         name: 'sendtransfer',
         content: 'send (enter)',
         style: {
@@ -1177,45 +1346,18 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
-    //allow control the table with the keyboard
-    // transactionTable.focus()
-    screen.render();
-
-    // x keypress
-    walletWindow.key(['x'], function(ch, key) {
-        wallet.saveWalletToFile(`${fileName}.wallet`, password);
-        wallet.stop();
-        walletWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
-    })
-
-    // t keypress
-    walletWindow.key(['t'], function(ch, key) {
-        transferWindow.setFront();
-        screen.render();
-    })
-
-    // t keypress
-    walletWindow.key(['s'], function(ch, key) {
-        settingsWindow.setFront();
-        screen.render();
-    })
-
-    walletWindow.key(['w'], function(ch, key) {
-        // draw the window
+    // on send transfer button press
+    transferButton.on('press', function() {
+        screen.focusPop();
+        transferForm.submit();
         walletWindow.setFront();
+        walletWindow.focus();
         screen.render();
-    })
+    });
 
-    // quit on top right button
-    closeWalletButton.on('press', function() {
-        wallet.saveWalletToFile(`${fileName}.wallet`, password);
-        wallet.stop();
-        walletWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
-    })
+    ///////////////////////////////////////////////////////////////////
+    //  WALLET EVENTS
+    //////////////////////////////////////////////////////////////////
 
     // on transaction
     wallet.on('transaction', async function() {
@@ -1253,26 +1395,9 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
-    // on addressbutton click
-    addressButton.on('click', async function() {
-
-        // copy to clipboard
-        clipboardy.writeSync(addressString);
-
-        // define notification text
-        let notificationText = blessed.text({
-            parent: navBar,
-            top: 0,
-            left: '60%',
-            fg: 'grey',
-            content: `Copied to clipboard!`
-        })
-
-        // wait .5s and destroy the notification text
-        await sleep(500);
-        notificationText.destroy();
-
-    });
+    // focus window and render screen
+    walletWindow.focus();
+    screen.render();
 
 };
 
@@ -1329,7 +1454,7 @@ function getRecentTransactions(walletData) {
     for (const tx of walletData) {
         amountArray.push([convertTimestamp(tx.timestamp), humanReadable(tx.totalAmount())]);
     }
-    return amountArray
+    return amountArray;
 }
 
 // convert unix timestamp into human readable
@@ -1344,4 +1469,8 @@ function convertTimestamp(timestamp) {
     // ie: 2013-02-18, 16:35	
     time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
     return time;
+}
+
+function logFile(data) {
+    walletLogStream.write(data + '\n');
 }
