@@ -5,7 +5,7 @@
   "main": "./dist/wallet.js",
   "dependencies": {
     "blessed": "^0.1.81",
-    "blessed-contrib": "^4.8.15",
+    "blessed-contrib": "github:ExtraHash/blessed-contrib#master",
     "clipboardy": "^2.0.0",
     "turtlecoin-wallet-backend": "^1.1.6"
   },

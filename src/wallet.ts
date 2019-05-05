@@ -1,6 +1,6 @@
-   ///////////////////////////////////////////////////////////////
-  //    Copyright ExtraHash 2019                               //
- //     Please see included LICENSE file for more details     //
+///////////////////////////////////////////////////////////////
+//    Copyright ExtraHash 2019                               //
+//     Please see included LICENSE file for more details     //
 ///////////////////////////////////////////////////////////////
 
 // imports
@@ -1174,18 +1174,18 @@ function drawWalletWindow(fileName, password) {
 
     // NOTE: commented out invalid TableOptions
     let transactionTable = contrib.table({
-        // parent: rightColumn,
+        parent: rightColumn,
         bg: 'black',
         fg: 'grey',
         selectedFg: 'white',
         selectedBg: 'black',
-        // label: 'Recent Transactions',
-        // width: '100%',
-        // height: '100%',
-        // border: {
-        //     type: "line",
-        //     fg: "white"
-        // },
+        label: 'Recent Transactions',
+        width: '100%',
+        height: '100%',
+        border: {
+        type: "line",
+        fg: "white"
+        },
         columnSpacing: 6,
         columnWidth: [18, 20]
     })
