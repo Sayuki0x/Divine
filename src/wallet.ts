@@ -336,8 +336,7 @@ function drawOpenWindow(error?: any) {
         parent: navBar,
         top: 'center',
         left: 'center',
-        fg: 'red',
-        content: 'test'
+        fg: 'red'
     })
 
     if(error !== undefined) {
@@ -1124,12 +1123,15 @@ function drawWalletWindow(fileName, password) {
     // on addressbutton click
     addressButton.on('click', async function() {
 
+        notificationText.setContent('Copied to clipboard!');
+
         // copy to clipboard
         clipboardy.writeSync(addressString);
 
         // wait .5s and destroy the notification text
         await sleep(500);
-        notificationText.destroy();
+        
+        notificationText.setContent('');
 
     });
 
@@ -1466,18 +1468,12 @@ function drawWalletWindow(fileName, password) {
     // on transaction
     wallet.on('transaction', async function() {
 
-        // define notification text
-        let notificationText = blessed.text({
-            parent: navBar,
-            top: 0,
-            left: '60%',
-            fg: 'white',
-            content: `New transaction found!`
-        })
+        notificationText.setContent('New transation found!');
+
 
         // wait .5s and destroy the notification text
         await sleep(2000);
-        notificationText.destroy();
+        notificationText.setContent('');
 
         // get wallet data and set it in walletBalance
         let updateBalance = wallet.getBalance();
