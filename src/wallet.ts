@@ -432,6 +432,7 @@ function drawOpenWindow() {
         name: 'filename',
         mouse: true,
         keys: true,
+        vi: false,
         top: 1,
         left: 0,
         width: 33,
@@ -478,6 +479,7 @@ function drawOpenWindow() {
         name: 'password',
         mouse: true,
         keys: true,
+        vi: false,
         top: 5,
         left: 0,
         width: 33,
@@ -1052,6 +1054,14 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
+    // define notification text
+    let notificationText = blessed.text({
+        parent: navBar,
+        top: 0,
+        left: '60%',
+        fg: 'grey',
+    })
+
     ///////////////////////////////////////////////////////////////////
     //  WALLET WINDOW
     //////////////////////////////////////////////////////////////////
@@ -1099,15 +1109,6 @@ function drawWalletWindow(fileName, password) {
         // copy to clipboard
         clipboardy.writeSync(addressString);
 
-        // define notification text
-        let notificationText = blessed.text({
-            parent: navBar,
-            top: 0,
-            left: '60%',
-            fg: 'grey',
-            content: `Copied to clipboard!`
-        })
-
         // wait .5s and destroy the notification text
         await sleep(500);
         notificationText.destroy();
@@ -1143,9 +1144,9 @@ function drawWalletWindow(fileName, password) {
 
     // set balance labels content
     walletBalanceLabels.setContent(
-        '{bold}Available:{/}\n' +
-        '{bold}{red-fg}Locked:{/}\n' +
-        '{grey-fg}Total:{/}'
+        ' {bold}Available:{/}\n' +
+        ' {bold}{red-fg}Locked:{/}\n' +
+        ' {grey-fg}Total:{/}'
     );
 
     // get balance
@@ -1153,9 +1154,9 @@ function drawWalletWindow(fileName, password) {
 
     // set balance content
     walletBalance.setContent(
-        `{|}{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/}\n` +
-        `{|}{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
-        `{|}{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/}`);
+        `{|}{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/} \n` +
+        `{|}{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/} \n` +
+        `{|}{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/} `);
 
 
     //////////////////////////////////// RIGHT COLUMN CODE STARTS HERE
@@ -1256,7 +1257,7 @@ function drawWalletWindow(fileName, password) {
             paymentID = undefined;
         }
         try {
-            const [hash, error] = await wallet.sendTransactionBasic(data.address, parseInt(data.amount), paymentID);
+            const [hash, error] = await wallet.sendTransactionBasic(data.address, atomicUnits(parseInt(data.amount)), paymentID);
         } catch(err) {
             logFile(err);
         }
@@ -1290,6 +1291,7 @@ function drawWalletWindow(fileName, password) {
         mouse: true,
         inputOnFocus: true,
         height: 3,
+        vi: false,
         border: {
             type: 'line',
             fg: 'grey'
@@ -1323,6 +1325,7 @@ function drawWalletWindow(fileName, password) {
         left: 0,
         width: 40,
         mouse: true,
+        vi: false,
         inputOnFocus: true,
         height: 3,
         border: {
@@ -1357,8 +1360,8 @@ function drawWalletWindow(fileName, password) {
         left: 0,
         width: 20,
         mouse: true,
+        vi: false,
         inputOnFocus: true,
-        keys: true,
         height: 3,
         border: {
             type: 'line',
@@ -1498,8 +1501,8 @@ function refreshSync(syncStatus, wallet, progress) {
         }    
 
     syncStatus.setContent(
-        `{bold}Status:{/}{|}{red-fg}${walletHeight}{/red-fg} of{/bold} ${networkHeight}\n` +
-        `{|}${percentSync}%`
+        ` {bold}Status:{/}{|}{red-fg}${walletHeight}{/red-fg} of{/bold} ${networkHeight} \n` +
+        `{|}${percentSync}% `
         );
     progress.setProgress(percentSync);
     screen.render();
@@ -1508,6 +1511,10 @@ function refreshSync(syncStatus, wallet, progress) {
 // convert atomic units to human readable amount
 function humanReadable(amount) {
     return (amount / 100).toFixed(2);
+}
+
+function atomicUnits(amount) {
+    return (amount * 100);
 }
 
 // sleep
