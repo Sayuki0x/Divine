@@ -3,7 +3,7 @@
  //     Please see included LICENSE file for more details     //
 ///////////////////////////////////////////////////////////////
 
-// requires
+// imports
 import WB = require('turtlecoin-wallet-backend');
 import clipboardy = require('clipboardy');
 import blessed = require('blessed');
@@ -662,7 +662,6 @@ function drawCreateWindow() {
         top: 5,
         left: 0,
         width: 33,
-        // mouse: false,
         inputOnFocus: true,
         vi: false,
         keys: true,
@@ -693,7 +692,6 @@ function drawCreateWindow() {
         },
         left: 0,
         top: 8,
-        // shrink: true,
         name: 'openwallet',
         content: 'create wallet (enter)',
         style: {
@@ -904,7 +902,6 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: '97%',
         top: '0%',
-        // shrink: true,
         name: 'close',
         content: '(x)',
         style: {
@@ -938,7 +935,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 0,
         top: '0%',
-        // shrink: true,
         name: 'wallet',
         content: '(w)allet',
         style: {
@@ -971,7 +967,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 11,
         top: '0%',
-        // shrink: true,
         name: 'transfer',
         content: '(t)ransfer',
         style: {
@@ -1057,7 +1052,6 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: 0,
         top: 0,
-        // shrink: true,
         name: 'address',
         content: addressString,
         style: {
