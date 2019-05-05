@@ -459,6 +459,10 @@ function drawOpenWindow() {
         navBar.destroy();
     })
 
+    fileName.on('blur', function() {
+        screen.focusPop();
+    })
+
     // define password textbox label
     let openPasswordLabel = blessed.text({
         parent: openForm,
@@ -500,6 +504,10 @@ function drawOpenWindow() {
         openWindow.destroy();
         navBar.destroy();
         screen.render();
+    })
+
+    fileName.on('blur', function() {
+        screen.focusPop();
     })
 
     // define submit button
@@ -1106,24 +1114,20 @@ function drawWalletWindow(fileName, password) {
 
     });
 
-    // define the progress bar for sync
+    // define the synchronization text label
     let syncStatus = blessed.text({
         parent: leftColumn,
-        top: '80%',
+        top: '75%',
         left: 0,
         fg: 'white',
         tags: true
     });
 
-    // refresh the progress bar every second
-    refreshSync(syncStatus, wallet, walletWindow);
-    setInterval(refreshSync.bind(null, syncStatus, wallet, walletWindow), 1000);
-
     // define the wallet balance
     let walletBalance = blessed.text({
         parent: leftColumn,
         top: 5,
-        left: '45%',
+        left: 0,
         fg: 'white',
         tags: true
     });
@@ -1149,9 +1153,9 @@ function drawWalletWindow(fileName, password) {
 
     // set balance content
     walletBalance.setContent(
-        `{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/}\n` +
-        `{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
-        `{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/}`);
+        `{|}{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/}\n` +
+        `{|}{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/}\n` +
+        `{|}{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/}`);
 
 
     //////////////////////////////////// RIGHT COLUMN CODE STARTS HERE
@@ -1190,6 +1194,36 @@ function drawWalletWindow(fileName, password) {
         headers: ['Time', 'Amount'],
         data: txArray
     })
+
+
+    ///////////////////////////////////////////////////////////////////
+    //  SYNC BAR
+    //////////////////////////////////////////////////////////////////
+    let progress = blessed.progressbar({
+        parent: walletWindow,
+        style: {
+            fg: 'red',
+            bg: 'default',
+            bar: {
+                bg: 'default',
+                fg: 'red'
+            },
+            border: {
+                fg: 'default',
+                bg: 'default'
+            }
+        },
+        ch: ':',
+        width: '100%',
+        height: 1,
+        top: '90%',
+        left: '0%',
+        filled: 0
+    });
+
+    // refresh the sync information every second
+    refreshSync(syncStatus, wallet, progress);
+    setInterval(refreshSync.bind(null, syncStatus, wallet, progress), 1000);
 
     ///////////////////////////////////////////////////////////////////
     //  TRANSFER WINDOW
@@ -1267,6 +1301,11 @@ function drawWalletWindow(fileName, password) {
         screen.focusPop();
     });
 
+    addressInput.on('blur', function() {
+        screen.focusPop();
+    })
+    
+
     // define password textbox label
     let idLabel = blessed.text({
         parent: transferForm,
@@ -1296,6 +1335,10 @@ function drawWalletWindow(fileName, password) {
     idInput.on('click', function() {
         screen.focusPop();
     });
+
+    idInput.on('blur', function() {
+        screen.focusPop();
+    })
 
     // define password textbox label
     let amountLabel = blessed.text({
@@ -1327,6 +1370,10 @@ function drawWalletWindow(fileName, password) {
     amountInput.on('click', function() {
         screen.focusPop();
     });
+
+    amountInput.on('blur', function() {
+        screen.focusPop();
+    })
 
     let availableBalanceText = blessed.text({
         parent: transferForm,
@@ -1367,10 +1414,6 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     });
 
-    ///////////////////////////////////////////////////////////////////
-    //  WALLET EVENTS
-    //////////////////////////////////////////////////////////////////
-
     // on transaction
     wallet.on('transaction', async function() {
 
@@ -1390,9 +1433,9 @@ function drawWalletWindow(fileName, password) {
         // get wallet data and set it in walletBalance
         let updateBalance = wallet.getBalance();
         walletBalance.setContent(
-            `{bold}${WB.prettyPrintAmount(updateBalance[0])}{/}\n` +
-            `{bold}{red-fg}${WB.prettyPrintAmount(updateBalance[1])}{/}\n` +
-            `{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
+            `{|}{bold}${WB.prettyPrintAmount(updateBalance[0])}{/}\n` +
+            `{|}{bold}{red-fg}${WB.prettyPrintAmount(updateBalance[1])}{/}\n` +
+            `{|}{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
 
         let updateTransactionList = wallet.getTransactions();
 
@@ -1422,31 +1465,43 @@ function createWallet(fileName, password) {
 }
 
 // refresh the sync bar
-function refreshSync(syncStatus, wallet, walletScreen) {
-    let syncBarFill = (wallet.getSyncStatus()[0] / wallet.getSyncStatus()[2] * 100).toFixed(2);
-    syncStatus.setContent(`{bold}Synchronization:{/} ${wallet.getSyncStatus()[0]}/${wallet.getSyncStatus()[1]} ${syncBarFill}%`);
-    let progress = blessed.progressbar({
-        parent: walletScreen,
-        style: {
-            fg: 'red',
-            bg: 'default',
-            bar: {
-                bg: 'default',
-                fg: 'red'
-            },
-            border: {
-                fg: 'default',
-                bg: 'default'
-            }
-        },
-        ch: ':',
-        width: '100%',
-        height: 1,
-        top: '90%',
-        left: '0%',
-        filled: 0
-    });
-    progress.setProgress(syncBarFill);
+function refreshSync(syncStatus, wallet, progress) {
+
+    // get sync status data
+    let [walletHeight, localHeight, networkHeight] = wallet.getSyncStatus();
+
+        /* Since we update the network height in intervals, and we update wallet
+        height by syncing, occasionaly wallet height is > network height.
+        Fix that here. */
+        if (walletHeight > networkHeight && networkHeight !== 0 && networkHeight + 10 > walletHeight) {
+            networkHeight = walletHeight;
+        }
+
+        /* if the wallet has been synced in the past, the wallet will sometimes display
+        currentHeight / 0, so if networkHeight is 0 set it equal to block height */
+        if (networkHeight === 0 && walletHeight !== 0) {
+            networkHeight = walletHeight;
+        }
+
+        // Don't divide by zero 
+        let syncFill = networkHeight === 0 ? 0 : walletHeight / networkHeight;
+        let percentSync = 100 * syncFill;
+
+        // Prevent bar looking full when it's not 
+        if (syncFill > 0.97 && syncFill < 1) {
+            syncFill = 0.97;
+        }
+
+        // Prevent 100% when just under 
+        if (percentSync > 99.99 && percentSync < 100) {
+            percentSync = 99.99;
+        }    
+
+    syncStatus.setContent(
+        `{bold}Status:{/}{|}{red-fg}${walletHeight}{/red-fg} of{/bold} ${networkHeight}\n` +
+        `{|}${percentSync}%`
+        );
+    progress.setProgress(percentSync);
     screen.render();
 }
 
@@ -1483,6 +1538,7 @@ function convertTimestamp(timestamp) {
     return time;
 }
 
+// lot to divinewallet.log
 function logFile(data) {
     walletLogStream.write(`${convertTimestamp(Date.now())} ${data} \n`);
 }
