@@ -998,7 +998,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 22,
         top: '0%',
-        // shrink: true,
         name: 'settings',
         content: '(s)ettings',
         style: {
@@ -1147,6 +1146,7 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    // NOTE: commented out invalid TableOptions
     let transactionTable = contrib.table({
         // parent: rightColumn,
         bg: 'black',
