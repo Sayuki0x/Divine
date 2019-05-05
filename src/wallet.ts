@@ -49,6 +49,9 @@ function drawSplashScreen() {
         }
     });
 
+    // focus the window
+    splashWindow.focus();
+
     // on click for splashwindow
     splashWindow.on('click', function() {
         splashWindow.destroy();
@@ -138,8 +141,7 @@ function drawSplashScreen() {
     )
     welcomeMessage.setContent('{bold}PRESS START{/}');
 
-    // rfocus the window and ender the screen
-    splashWindow.focus();
+    // render the screen
     screen.render();
 
 }
@@ -167,6 +169,9 @@ function drawStartWindow() {
             bg: 'black',
         }
     });
+
+    // focus the window
+    startWindow.focus();
 
     // o keypress
     startWindow.key(['o'], function(ch, key) {
@@ -214,7 +219,6 @@ function drawStartWindow() {
         shrink: true,
         left: '97%',
         top: '0%',
-        name: 'close',
         content: '(x)',
         style: {
             bg: 'black',
@@ -245,7 +249,6 @@ function drawStartWindow() {
         },
         left: 0,
         top: 0,
-        name: 'open',
         content: '(o)pen',
         style: {
             bg: 'black',
@@ -274,7 +277,6 @@ function drawStartWindow() {
         },
         left: 0,
         top: 1,
-        name: 'create',
         content: '(c)reate',
         style: {
             bg: 'black',
@@ -303,7 +305,6 @@ function drawStartWindow() {
         },
         left: 0,
         top: 2,
-        name: 'import',
         content: '(i)mport',
         style: {
             bg: 'black',
@@ -314,8 +315,7 @@ function drawStartWindow() {
         }
     });
 
-    // focus window and render screen
-    startWindow.focus();
+    // render screen
     screen.render();
 }
 
@@ -343,8 +343,11 @@ function drawOpenWindow() {
         }
     });
 
+    openWindow.focus();
+
     openWindow.on('click', function() {
         screen.focusPop();
+        openWindow.focus();
     });
 
     // enter keypress
@@ -375,7 +378,6 @@ function drawOpenWindow() {
         shrink: true,
         left: '97%',
         top: '0%',
-        name: 'close',
         content: '(x)',
         style: {
             bg: 'black',
@@ -443,6 +445,7 @@ function drawOpenWindow() {
         fg: 'white',
     });
 
+    // pop focus on textbox click
     fileName.on('click', function() {
         screen.focusPop();
         screen.render();
@@ -450,8 +453,8 @@ function drawOpenWindow() {
 
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
-        screen.focusPop();
         openForm.submit();
+        screen.focusPop();
         openWindow.destroy();
         navBar.destroy();
         screen.render();
@@ -486,6 +489,7 @@ function drawOpenWindow() {
         fg: 'white',
     });
 
+    // pop focus on textbox click
     password.on('click', function() {
         screen.focusPop();
     });
@@ -493,6 +497,7 @@ function drawOpenWindow() {
     // enter keypress
     password.key(['enter'], function(ch, key) {
         openForm.submit();
+        screen.focusPop();
         openWindow.destroy();
         navBar.destroy();
         screen.render();
@@ -509,7 +514,6 @@ function drawOpenWindow() {
         },
         left: 0,
         top: 8,
-        name: 'openwallet',
         content: 'open wallet (enter)',
         style: {
             bg: 'black',
@@ -559,13 +563,16 @@ function drawCreateWindow() {
         }
     });
 
+    // focus the window
     createWindow.focus();
 
+    // pop focus on window click
     createWindow.on('click', function() {
         screen.focusPop();
         createWindow.focus();
     });
 
+    // exit on x keypress
     createWindow.key('x', function() {
         createWindow.destroy();
         drawSplashScreen();
@@ -582,7 +589,6 @@ function drawCreateWindow() {
         shrink: true,
         left: '97%',
         top: '0%',
-        name: 'close',
         content: '(x)',
         style: {
             bg: 'black',
@@ -622,7 +628,6 @@ function drawCreateWindow() {
         createWallet(data.filename, data.password);
     });
 
-
     // define filename textbox label
     let createLabel = blessed.text({
         parent: createForm,
@@ -652,14 +657,17 @@ function drawCreateWindow() {
         fg: 'white',
     });
 
+    // focus on the textbox
     fileName.focus();
 
+    // pop focus on click
     fileName.on('click', function() {
         screen.focusPop();
     });
 
+    //
     fileName.key(['esc'], function() {
-        createWindow.focus();
+        screen.rewindFocus();
     });
 
     // define password textbox label
@@ -692,6 +700,7 @@ function drawCreateWindow() {
         fg: 'white',
     });
 
+    // pop focus on click
     password.on('click', function() {
         screen.focusPop();
     });
@@ -709,7 +718,6 @@ function drawCreateWindow() {
         },
         left: 0,
         top: 8,
-        name: 'openwallet',
         content: 'create wallet (enter)',
         style: {
             bg: 'black',
@@ -729,7 +737,6 @@ function drawCreateWindow() {
     });
 
     // render the screen
-    createWindow.focus();
     screen.render();
 
 
@@ -822,7 +829,7 @@ function drawWalletWindow(fileName, password) {
     transferWindow.key(['t'], function(ch, key) {
         screen.focusPop();
         transferWindow.setFront();
-        transferForm.focus();
+        addressInput.focus();
         screen.render();
     })
 
@@ -842,7 +849,7 @@ function drawWalletWindow(fileName, password) {
     settingsWindow.key(['t'], function(ch, key) {
         screen.focusPop();
         transferWindow.setFront();
-        transferWindow.focus();
+        addressInput.focus();
         screen.render();
     })
 
@@ -889,7 +896,7 @@ function drawWalletWindow(fileName, password) {
     walletWindow.key(['t'], function(ch, key) {
         screen.focusPop();
         transferWindow.setFront();
-        transferWindow.focus();
+        addressInput.focus();
         screen.render();
     })
 
@@ -928,7 +935,6 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: '97%',
         top: '0%',
-        name: 'close',
         content: '(x)',
         style: {
             bg: 'black',
@@ -961,7 +967,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 0,
         top: '0%',
-        name: 'wallet',
         content: '(w)allet',
         style: {
             bg: 'black',
@@ -974,7 +979,6 @@ function drawWalletWindow(fileName, password) {
     })
 
     walletNavButton.on('press', function() {
-        // draw the window
         screen.focusPop();
         walletWindow.setFront();
         walletWindow.focus();
@@ -993,7 +997,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 11,
         top: '0%',
-        name: 'transfer',
         content: '(t)ransfer',
         style: {
             bg: 'black',
@@ -1008,7 +1011,7 @@ function drawWalletWindow(fileName, password) {
     transferNavButton.on('press', function() {
         screen.focusPop();
         transferWindow.setFront();
-        transferWindow.focus();
+        addressInput.focus();
         screen.render();
     })
 
@@ -1024,7 +1027,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 22,
         top: '0%',
-        name: 'settings',
         content: '(s)ettings',
         style: {
             bg: 'black',
@@ -1047,7 +1049,6 @@ function drawWalletWindow(fileName, password) {
     //  WALLET WINDOW
     //////////////////////////////////////////////////////////////////
 
-
     //////////////////////////////////// LEFT COLUMN CODE STARTS HERE
     let leftColumn = blessed.box({
         parent: walletWindow,
@@ -1066,9 +1067,6 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
-
-
-
     // define the address button
     let addressButton = blessed.button({
         parent: leftColumn,
@@ -1077,7 +1075,6 @@ function drawWalletWindow(fileName, password) {
         shrink: true,
         left: 0,
         top: 0,
-        name: 'address',
         content: addressString,
         style: {
             bg: 'black',
@@ -1355,7 +1352,6 @@ function drawWalletWindow(fileName, password) {
         },
         left: 0,
         top: 12,
-        name: 'sendtransfer',
         content: 'send (enter)',
         style: {
             bg: 'black',
