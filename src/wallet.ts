@@ -21,7 +21,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.1.0'
+    title: 'DivineWallet v0.1.1'
 });
 
 // run the initial function
