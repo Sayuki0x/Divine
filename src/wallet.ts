@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////
-//    Copyright ExtraHash 2019                               //
-//     Please see included LICENSE file for more details     //
-///////////////////////////////////////////////////////////////
+//    Copyright ExtraHash 2019                              //
+//    Please see included LICENSE file for more details    //
+////////////////////////////////////////////////////////////
 
 // imports
 import WB = require('turtlecoin-wallet-backend');
@@ -146,7 +146,7 @@ function drawSplashScreen() {
 
 }
 
-// draw the start win   dow
+// draw the start window
 function drawStartWindow() {
 
     // draw the navbar
@@ -356,7 +356,6 @@ function drawOpenWindow() {
         openForm.submit();
         openWindow.destroy();
         navBar.destroy();
-        screen.render();
     })
 
 
@@ -392,6 +391,7 @@ function drawOpenWindow() {
     // quit on top right button
     closeWalletButton.on('press', function() {
         openWindow.destroy();
+        navBar.destroy();
         drawSplashScreen();
     })
 
@@ -453,11 +453,10 @@ function drawOpenWindow() {
 
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
-        openForm.submit();
         screen.focusPop();
+        openForm.submit();
         openWindow.destroy();
         navBar.destroy();
-        screen.render();
     })
 
     // define password textbox label
@@ -496,8 +495,8 @@ function drawOpenWindow() {
 
     // enter keypress
     password.key(['enter'], function(ch, key) {
-        openForm.submit();
         screen.focusPop();
+        openForm.submit();
         openWindow.destroy();
         navBar.destroy();
         screen.render();
@@ -528,7 +527,6 @@ function drawOpenWindow() {
     openWalletButton.on('press', function() {
         screen.focusPop();
         openForm.submit();
-        openForm.destroy();
         openWindow.destroy();
         navBar.destroy();
     });
@@ -572,6 +570,13 @@ function drawCreateWindow() {
         createWindow.focus();
     });
 
+    // enter keypress
+    createWindow.key(['enter'], function(ch, key) {
+        createForm.submit();
+        createWindow.destroy();
+        navBar.destroy();
+    })
+
     // exit on x keypress
     createWindow.key('x', function() {
         createWindow.destroy();
@@ -609,9 +614,9 @@ function drawCreateWindow() {
     // define open wallet form
     let createForm = blessed.form({
         parent: createWindow,
+        keys: true,
         left: 'center',
         top: '20%',
-        keys: true,
         mouse: true,
         width: 35,
         height: 11,
@@ -663,11 +668,6 @@ function drawCreateWindow() {
     // pop focus on click
     fileName.on('click', function() {
         screen.focusPop();
-    });
-
-    //
-    fileName.key(['esc'], function() {
-        screen.rewindFocus();
     });
 
     // define password textbox label
@@ -730,15 +730,14 @@ function drawCreateWindow() {
 
     // on create wallet button press
     createWalletButton.on('press', function() {
+        screen.focusPop();
         createForm.submit();
         createWindow.destroy();
         navBar.destroy();
-        screen.render();
     });
 
     // render the screen
     screen.render();
-
 
 }
 
@@ -1214,7 +1213,6 @@ function drawWalletWindow(fileName, password) {
 
     transferForm.on('click', function() {
         screen.focusPop();
-        transferWindow.focus();
     })
 
     // transfer form post handling
@@ -1328,7 +1326,7 @@ function drawWalletWindow(fileName, password) {
 
     amountInput.on('click', function() {
         screen.focusPop();
-        });
+    });
 
     let availableBalanceText = blessed.text({
         parent: transferForm,
@@ -1343,9 +1341,7 @@ function drawWalletWindow(fileName, password) {
     let transferButton = blessed.button({
         parent: transferForm,
         mouse: true,
-        keys: true,
         shrink: true,
-        tags: true,
         padding: {
             left: 14,
             right: 14
@@ -1488,5 +1484,5 @@ function convertTimestamp(timestamp) {
 }
 
 function logFile(data) {
-    walletLogStream.write(data + '\n');
+    walletLogStream.write(`${convertTimestamp(Date.now())} ${data} \n`);
 }
