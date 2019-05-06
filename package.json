@@ -16,7 +16,8 @@
   "scripts": {
     "start": "node dist/wallet.js",
     "setup": "npm install",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "standard"
   },
   "repository": {
     "type": "git",
