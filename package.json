@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "@types/node": "^12.0.0",
-    "typescript": "^3.5.0-dev.20190504"
+    "typescript": "^3.5.0-dev.20190504",
+    "standard": "^12.0.1"
   },
   "scripts": {
     "start": "node dist/wallet.js",
