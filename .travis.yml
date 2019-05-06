@@ -6,7 +6,6 @@ os:
   - windows
 node_js:
   - 'lts/*'
-  - 'node'
 before_script:
   - npm run setup
   - npm run build
