@@ -79,7 +79,7 @@ function drawSplashScreen() {
     // render the X button
     let closeWalletButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         left: '97%',
         top: '0%',
@@ -224,7 +224,7 @@ function drawStartWindow() {
     // define the close button
     let closeWalletButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         left: '97%',
         top: '0%',
@@ -250,7 +250,7 @@ function drawStartWindow() {
     // define the "open wallet" button
     let openWalletButton = blessed.button({
         parent: startMenu,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         padding: {
             left: 2,
@@ -278,7 +278,7 @@ function drawStartWindow() {
     // define the "create wallet" button
     let createWalletButton = blessed.button({
         parent: startMenu,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         padding: {
             left: 2,
@@ -306,7 +306,7 @@ function drawStartWindow() {
     // define the "import wallet" button
     let importWalletButton = blessed.button({
         parent: startMenu,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         padding: {
             left: 2,
@@ -394,7 +394,7 @@ function drawOpenWindow(error?: any) {
     //  define close wallet button
     let closeWalletButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         left: '97%',
         top: '0%',
@@ -462,7 +462,7 @@ function drawOpenWindow(error?: any) {
     let fileName = blessed.textbox({
         parent: openForm,
         name: 'filename',
-        mouse: true,
+        // mouse: true,
         keys: true,
         vi: false,
         top: 1,
@@ -516,7 +516,7 @@ function drawOpenWindow(error?: any) {
     let password = blessed.textbox({
         parent: openForm,
         name: 'password',
-        mouse: true,
+        // mouse: true,
         keys: true,
         vi: false,
         top: 5,
@@ -560,7 +560,7 @@ function drawOpenWindow(error?: any) {
     // define submit button
     let openWalletButton = blessed.button({
         parent: openForm,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         padding: {
             left: 7,
@@ -662,7 +662,7 @@ function drawCreateWindow(error?: any) {
     // define close wallet buton
     let closeWalletButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         left: '97%',
         top: '0%',
@@ -689,7 +689,7 @@ function drawCreateWindow(error?: any) {
         keys: true,
         left: 'center',
         top: '20%',
-        mouse: true,
+        // mouse: true,
         width: 35,
         height: 11,
         bg: 'black',
@@ -729,7 +729,7 @@ function drawCreateWindow(error?: any) {
     let fileName = blessed.textbox({
         parent: createForm,
         name: 'filename',
-        mouse: true,
+        // mouse: true,
         keys: true,
         top: 1,
         left: 0,
@@ -784,7 +784,7 @@ function drawCreateWindow(error?: any) {
     let password = blessed.textbox({
         parent: createForm,
         name: 'password',
-        mouse: true,
+        // mouse: true,
         top: 5,
         left: 0,
         width: 33,
@@ -828,7 +828,7 @@ function drawCreateWindow(error?: any) {
     // define create form submit button
     let createWalletButton = blessed.button({
         parent: createForm,
-        mouse: true,
+        // mouse: true,
         keys: true,
         shrink: true,
         tags: true,
@@ -953,6 +953,17 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
+    // x keypress
+    transferWindow.key(['x', 'escape'], function(ch, key) {
+        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.stop();
+        walletWindow.destroy();
+        transferWindow.destroy();
+        settingsWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
     let settingsWindow = blessed.box({
         top: '10%',
         left: '0%',
@@ -990,6 +1001,17 @@ function drawWalletWindow(fileName, password) {
         screen.render();
     })
 
+    // x keypress
+    settingsWindow.key(['x', 'escape'], function(ch, key) {
+        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.stop();
+        walletWindow.destroy();
+        transferWindow.destroy();
+        settingsWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
     // draw the window
     let walletWindow = blessed.box({
         top: '10%',
@@ -1008,6 +1030,8 @@ function drawWalletWindow(fileName, password) {
         wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
+        transferWindow.destroy();
+        settingsWindow.destroy();
         navBar.destroy();
         drawSplashScreen();
     })
@@ -1054,7 +1078,7 @@ function drawWalletWindow(fileName, password) {
     // render the X button
     let closeWalletButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         keys: true,
         shrink: true,
         left: '97%',
@@ -1082,7 +1106,7 @@ function drawWalletWindow(fileName, password) {
     // define wallet button
     let walletNavButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         keys: true,
         shrink: true,
         padding: {
@@ -1111,7 +1135,7 @@ function drawWalletWindow(fileName, password) {
     // define transfers button
     let transferNavButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         keys: true,
         shrink: true,
         padding: {
@@ -1140,7 +1164,7 @@ function drawWalletWindow(fileName, password) {
     // define settings button
     let settingsNavButton = blessed.button({
         parent: navBar,
-        mouse: true,
+        // mouse: true,
         keys: true,
         shrink: true,
         padding: {
@@ -1443,7 +1467,7 @@ function drawWalletWindow(fileName, password) {
         top: 1,
         left: 0,
         width: 40,
-        mouse: true,
+        // mouse: true,
         inputOnFocus: true,
         height: 3,
         vi: false,
@@ -1489,7 +1513,7 @@ function drawWalletWindow(fileName, password) {
         top: 5,
         left: 0,
         width: 40,
-        mouse: true,
+        // mouse: true,
         vi: false,
         inputOnFocus: true,
         height: 3,
@@ -1534,7 +1558,7 @@ function drawWalletWindow(fileName, password) {
         top: 9,
         left: 0,
         width: 20,
-        mouse: true,
+        // mouse: true,
         vi: false,
         inputOnFocus: true,
         height: 3,
@@ -1575,7 +1599,7 @@ function drawWalletWindow(fileName, password) {
     // define submit button
     let transferButton = blessed.button({
         parent: transferForm,
-        mouse: true,
+        // mouse: true,
         shrink: true,
         padding: {
             left: 14,
