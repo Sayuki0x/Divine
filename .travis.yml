@@ -5,9 +5,8 @@ os:
   - osx
   - windows
 node_js:
-  - '6'
-  - '8'
-  - '10'
+  - 'lts/*'
+  - 'node'
 before_script:
   - npm run setup
   - npm run build
