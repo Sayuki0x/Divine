@@ -15,6 +15,7 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 1. Clone the repository
 
 `mkdir Divine && cd Divine`
+
 `git clone https://github.com/turtlecoin/turtlecoin-wallet-nodejs/ .`
 
 2. Install the dependencies
