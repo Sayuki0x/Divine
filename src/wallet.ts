@@ -20,7 +20,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.2.0',
+    title: 'DivineWallet v0.2.1',
     debug: true
 });
 
@@ -1012,7 +1012,11 @@ function drawWalletWindow(fileName, password) {
         drawSplashScreen();
     })
 
-    // draw the window
+    settingsWindow.key(['C-c'], function(ch, key) {
+        backupKeys.press();
+    });
+
+    // draw the windows
     let walletWindow = blessed.box({
         top: '10%',
         left: '0%',
@@ -1352,6 +1356,69 @@ function drawWalletWindow(fileName, password) {
         headers: ['Time', 'Amount'],
         data: txArray
     })
+
+    ///////////////////////////////////////////////////////////////////
+    //  Settings WINDOW
+    //////////////////////////////////////////////////////////////////
+
+    // define the address button
+    let backupKeys = blessed.button({
+        parent: settingsWindow,
+        mouse: true,
+        keys: true,
+        shrink: true,
+        left: 'center',
+        top: 'center',
+        tags: true,
+        content: '{bold}click here or ctrl+c to copy private keys to the clipboard{/}',
+        style: {
+            bg: 'red',
+            fg: 'white',
+            hover: {
+                bg: 'black',
+                fg: 'red'
+            }
+        }
+    });
+
+    // on addressbutton click
+    backupKeys.on('click', async function() {
+        const [privateSpendKey, privateViewKey] = wallet.getPrimaryAddressPrivateKeys();
+        const [mnenomicSeed] = wallet.getMnemonicSeed();
+        const backupMessage = 
+            'Public address:\n' +
+            `${addressString}\n\n` +
+            'Private view key:\n' +
+            `${privateViewKey}\n\n` +
+            'Private spend key:\n' +
+            `${privateSpendKey}\n\n` +
+            'Mnemonic seed:\n' +
+            `${mnenomicSeed}`
+            
+        clipboardy.writeSync(backupMessage);
+        notifyUser(notificationText, '{bold}{red-fg}PRIVATE KEYS COPIED TO CLIPBOARD{/}', 500);
+        settingsWindow.focus();
+    });
+
+        // on addressbutton click
+        backupKeys.on('press', async function() {
+            const [privateSpendKey, privateViewKey] = wallet.getPrimaryAddressPrivateKeys();
+            const [mnenomicSeed] = wallet.getMnemonicSeed();
+            const backupMessage = 
+                'Public address:\n' +
+                `${addressString}\n\n` +
+                'Private view key:\n' +
+                `${privateViewKey}\n\n` +
+                'Private spend key:\n' +
+                `${privateSpendKey}\n\n` +
+                'Mnemonic seed:\n' +
+                `${mnenomicSeed}`
+                
+            clipboardy.writeSync(backupMessage);
+            notifyUser(notificationText, '{bold}{red-fg}PRIVATE KEYS COPIED TO CLIPBOARD{/}', 500);
+            settingsWindow.focus();
+        });
+    
 
 
     ///////////////////////////////////////////////////////////////////
@@ -1728,7 +1795,7 @@ function sleep(ms) {
 function getRecentTransactions(walletData) {
     let amountArray = [];
     for (const tx of walletData) {
-        amountArray.push([convertTimestamp(tx.timestamp), humanReadable(tx.totalAmount())]);
+        amountArray.push([convertTimestamp(tx.timestamp), numberWithCommas(humanReadable(tx.totalAmount()))]);
     }
     return amountArray;
 }
@@ -1759,4 +1826,9 @@ async function notifyUser(notificationArea: any, message: string, wait: number) 
     await sleep(wait);
     notificationArea.setContent('');
     screen.render();
+}
+
+// function to format numbers with commas like currency
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }

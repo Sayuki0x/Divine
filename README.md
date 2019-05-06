@@ -29,3 +29,16 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 4. Start the program
 
 `npm start`
+
+
+
+## todo
+
+1. add import from keys and seed
+2. allow custom wallet directory in settings
+3. change daemon in settings
+4. allow to click / key through the transaction list and press enter for more info (hash, block explorer url, etc)
+5. add notificaton queue that you can look at the history of and "clear"
+6. add address book
+7. add one to many and tx extra encoding "advanced transactions"
+8. add support to send keys to a printer
