@@ -14,7 +14,9 @@
     "typescript": "^3.5.0-dev.20190504"
   },
   "scripts": {
-    "start": "node dist/wallet.js"
+    "start": "node dist/wallet.js",
+    "setup": "npm install",
+    "build": "tsc --watch"
   },
   "repository": {
     "type": "git",
