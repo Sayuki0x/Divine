@@ -1587,7 +1587,7 @@ function refreshSync(syncStatus, wallet, progress) {
 
     syncStatus.setContent(
         ` {bold}Status:{/}{|}{red-fg}${walletHeight}{/red-fg} of{/bold} ${networkHeight} \n` +
-        `{|}${percentSync}% `
+        `{|}${percentSync.toFixed(2)}% `
         );
     progress.setProgress(percentSync);
     screen.render();
