@@ -67,7 +67,7 @@ function drawSplashScreen() {
     })
 
     // x command
-    splashWindow.key(['x'], function(ch, key) {
+    splashWindow.key(['x', 'escape'], function(ch, key) {
         screen.destroy();
         return process.exit(0);
     })
@@ -157,7 +157,7 @@ function drawStartWindow() {
         width: '100%',
         height: '10%',
         bg: 'black'
-    })
+    });
 
     // draw the window
     let startWindow = blessed.box({
@@ -179,20 +179,20 @@ function drawStartWindow() {
         startWindow.destroy();
         navBar.destroy();
         drawOpenWindow();
-    })
+    });
 
     // c keypress
     startWindow.key(['c'], function(ch, key) {
         startWindow.destroy();
         navBar.destroy();
         drawCreateWindow();
-    })
+    });
 
-    startWindow.key(['x'], function(ch, key) {
+    startWindow.key(['x', 'escape'], function(ch, key) {
         startWindow.destroy();
         navBar.destroy();
         drawSplashScreen();
-    })
+    });
 
     // Append our welcomeScreen to the screen.
     screen.append(navBar);
@@ -380,13 +380,12 @@ function drawOpenWindow(error?: any) {
         navBar.destroy();
     })
 
-
-    // x keypress
-    openWindow.key(['x'], function(ch, key) {
+    // exit
+    openWindow.key(['x', 'escape'], function(ch, key) {
         openWindow.destroy();
         navBar.destroy();
         drawSplashScreen();
-    })
+    });
 
     // append the elements to the screen
     screen.append(openWindow);
@@ -479,12 +478,6 @@ function drawOpenWindow(error?: any) {
         fg: 'white',
     });
 
-    // pop focus on textbox click
-    fileName.on('click', function() {
-        screen.focusPop();
-        screen.render();
-    });
-
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
         screen.focusPop();
@@ -493,9 +486,22 @@ function drawOpenWindow(error?: any) {
         navBar.destroy();
     })
 
+    fileName.key(['escape'], function() {
+        screen.focusPop();
+        openWindow.focus();
+    })
+
     fileName.on('blur', function() {
         screen.focusPop();
+        openWindow.focus();
     })
+
+    // pop focus on textbox click
+    fileName.on('click', function() {
+        screen.focusPop();
+        screen.render();
+    });
+
 
     // define password textbox label
     let openPasswordLabel = blessed.text({
@@ -527,23 +533,29 @@ function drawOpenWindow(error?: any) {
         fg: 'white',
     });
 
-    // pop focus on textbox click
-    password.on('click', function() {
-        screen.focusPop();
-    });
-
     // enter keypress
     password.key(['enter'], function(ch, key) {
         screen.focusPop();
         openForm.submit();
         openWindow.destroy();
         navBar.destroy();
-        screen.render();
     })
 
-    fileName.on('blur', function() {
+    password.key(['escape'], function() {
         screen.focusPop();
+        openWindow.focus();
     })
+
+    password.on('blur', function() {
+        screen.focusPop();
+        openWindow.focus();
+    })
+
+    // pop focus on textbox click
+    password.on('click', function() {
+        screen.focusPop();
+        screen.render();
+    });
 
     // define submit button
     let openWalletButton = blessed.button({
@@ -617,6 +629,12 @@ function drawCreateWindow(error?: any) {
     createWindow.key(['enter'], function(ch, key) {
         createWalletButton.press();
     })
+
+    createWindow.key(['x', 'escape'], function(ch, key) {
+        createWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    });
 
     // exit on x keypress
     createWindow.key('x', function() {
@@ -727,12 +745,30 @@ function drawCreateWindow(error?: any) {
         fg: 'white',
     });
 
-    // focus on the textbox
     fileName.focus();
 
-    // pop focus on click
+    // enter keypress
+    fileName.key(['enter'], function(ch, key) {
+        screen.focusPop();
+        createForm.submit();
+        createWindow.destroy();
+        navBar.destroy();
+    })
+
+    fileName.key(['escape'], function() {
+        screen.focusPop();
+        createWindow.focus();
+    })
+
+    fileName.on('blur', function() {
+        screen.focusPop();
+        createWindow.focus();
+    })
+
+    // pop focus on textbox click
     fileName.on('click', function() {
         screen.focusPop();
+        screen.render();
     });
 
     // define password textbox label
@@ -765,9 +801,28 @@ function drawCreateWindow(error?: any) {
         fg: 'white',
     });
 
-    // pop focus on click
+    // enter keypress
+    password.key(['enter'], function(ch, key) {
+        screen.focusPop();
+        createForm.submit();
+        createWindow.destroy();
+        navBar.destroy();
+    })
+
+    password.key(['escape'], function() {
+        screen.focusPop();
+        createWindow.focus();
+    })
+
+    password.on('blur', function() {
+        screen.focusPop();
+        createWindow.focus();
+    })
+
+    // pop focus on textbox click
     password.on('click', function() {
         screen.focusPop();
+        screen.render();
     });
 
     // define create form submit button
@@ -949,7 +1004,7 @@ function drawWalletWindow(fileName, password) {
     });
 
     // x keypress
-    walletWindow.key(['x'], function(ch, key) {
+    walletWindow.key(['x', 'escape'], function(ch, key) {
         wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
@@ -957,13 +1012,17 @@ function drawWalletWindow(fileName, password) {
         drawSplashScreen();
     })
 
+    walletWindow.key(['C-c'], function(ch, key) {
+        addressButton.press();
+    });
+
     // t keypress
     walletWindow.key(['t'], function(ch, key) {
         screen.focusPop();
         transferWindow.setFront();
         addressInput.focus();
         screen.render();
-    })
+    });
 
     // t keypress
     walletWindow.key(['s'], function(ch, key) {
@@ -971,7 +1030,7 @@ function drawWalletWindow(fileName, password) {
         settingsWindow.setFront();
         settingsWindow.focus();
         screen.render();
-    })
+    });
 
     walletWindow.key(['w'], function(ch, key) {
         // draw the window
@@ -979,7 +1038,7 @@ function drawWalletWindow(fileName, password) {
         walletWindow.setFront();
         walletWindow.focus();
         screen.render();
-    })
+    });
 
     // append the elements
     walletWindow.focus();
@@ -1044,7 +1103,6 @@ function drawWalletWindow(fileName, password) {
     })
 
     walletNavButton.on('press', function() {
-        screen.focusPop();
         walletWindow.setFront();
         walletWindow.focus();
         screen.render();
@@ -1074,7 +1132,6 @@ function drawWalletWindow(fileName, password) {
     })
 
     transferNavButton.on('press', function() {
-        screen.focusPop();
         transferWindow.setFront();
         addressInput.focus();
         screen.render();
@@ -1104,7 +1161,6 @@ function drawWalletWindow(fileName, password) {
     })
 
     settingsNavButton.on('press', function() {
-        screen.focusPop();
         settingsWindow.setFront();
         settingsWindow.focus();
         screen.render();
@@ -1146,7 +1202,17 @@ function drawWalletWindow(fileName, password) {
         top: -1,
         left: 1,
         fg: 'white',
-        content: 'Balance Information'
+        tags: true,
+        content: '{bold}Balance{/}'
+    })
+
+    let leftColumnLabel2 = blessed.text({
+        parent: leftColumn,
+        top: 3,
+        left: 0,
+        fg: 'grey',
+        tags: true,
+        content: '{|}ctrl+c: copy address{/}'
     })
 
     // define the address button
@@ -1160,7 +1226,7 @@ function drawWalletWindow(fileName, password) {
         content: addressString,
         style: {
             bg: 'black',
-            fg: 'grey',
+            fg: 'white',
             hover: {
                 bg: 'black',
                 fg: 'red'
@@ -1169,8 +1235,17 @@ function drawWalletWindow(fileName, password) {
     });
 
     // on addressbutton click
+    addressButton.on('press', async function() {
+        clipboardy.writeSync(addressString);
+        notifyUser(notificationText, 'Copied to clipboard!', 500);
+        walletWindow.focus();
+    });
+
+    // on addressbutton click
     addressButton.on('click', async function() {
-        notifyUser(notificationText, 'Copied to clipboard!', 500)
+        clipboardy.writeSync(addressString);
+        notifyUser(notificationText, 'Copied to clipboard!', 500);
+        walletWindow.focus();
     });
 
     // define the synchronization text label
@@ -1379,18 +1454,23 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
     });
 
-    addressInput.on('click', function() {
-        screen.focusPop();
-    });
-
-    addressInput.on('blur', function() {
-        screen.focusPop();
-    })
-
     addressInput.key('enter', function() {
         transferButton.press();
     });
-    
+
+    addressInput.key(['escape'], function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    addressInput.on('blur', function() {
+        transferWindow.focus();
+    })
+
+    // pop focus on textbox click
+    addressInput.on('click', function() {
+        screen.focusPop();
+    });
 
     // define password textbox label
     let idLabel = blessed.text({
@@ -1420,16 +1500,22 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
     });
 
-    idInput.on('click', function() {
-        screen.focusPop();
-    });
-
-    idInput.on('blur', function() {
-        screen.focusPop();
-    });
-
     idInput.key('enter', function() {
         transferButton.press();
+    });
+
+    idInput.key(['escape'], function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    idInput.on('blur', function() {
+        transferWindow.focus();
+    })
+
+    // pop focus on textbox click
+    idInput.on('click', function() {
+        screen.focusPop();
     });
 
     // define password textbox label
@@ -1459,16 +1545,22 @@ function drawWalletWindow(fileName, password) {
         fg: 'white',
     });
 
-    amountInput.on('click', function() {
-        screen.focusPop();
-    });
-
-    amountInput.on('blur', function() {
-        screen.focusPop();
-    })
-
     amountInput.key('enter', function() {
         transferButton.press();
+    });
+
+    amountInput.key(['escape'], function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    amountInput.on('blur', function() {
+        transferWindow.focus();
+    })
+
+    // pop focus on textbox click
+    idInput.on('click', function() {
+        screen.focusPop();
     });
 
     let availableBalanceText = blessed.text({
