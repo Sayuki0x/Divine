@@ -8,3 +8,8 @@ node_js:
   - '6'
   - '8'
   - '10'
+before_script:
+  - npm run setup
+  - npm run build
+script: 
+  - npm test
