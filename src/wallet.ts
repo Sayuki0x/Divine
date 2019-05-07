@@ -19,7 +19,7 @@ directories.forEach(function(dir) {
     if (!fs.existsSync(dir)){
         fs.mkdirSync(dir);
     }
-});;
+});
 
 const [programDirectory, logDirectory, walletDirectory] = directories;
 
