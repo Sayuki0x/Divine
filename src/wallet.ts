@@ -12,7 +12,18 @@ import blessed = require('blessed');
 import contrib = require('blessed-contrib');
 import fs from 'fs';
 
-let walletLogStream = fs.createWriteStream(`./logs/divinewallet.log`, {
+const homedir = require('os').homedir();
+const directories = [homedir + '/.divinewallet', homedir + '/.divinewallet/logs', homedir + '/.divinewallet/wallets'];
+
+directories.forEach(function(dir) {
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
+});;
+
+const [programDirectory, logDirectory, walletDirectory] = directories;
+
+let walletLogStream = fs.createWriteStream(logDirectory + '/divinewallet.log', {
     flags: 'a'
 });
 
@@ -871,25 +882,25 @@ function drawWalletWindow(fileName, password) {
     ///////////////////////////////////////////////////////////////////
 
     // define and start the wallet
-    const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, `./wallets/${fileName}.wallet`, password);
+    const [wallet, error] = WB.WalletBackend.openWalletFromFile(daemon, walletDirectory+ `/${fileName}.wallet`, password);
     if (error) {
         logFile(error);
         return error;
     }
 
+    // delete log file if currently present
+    if (fs.existsSync(logDirectory + `${fileName}.log`)) {
+        fs.unlinkSync(logDirectory + `${fileName}.log`);
+    };
+
     // configure logging
     wallet.setLogLevel(WB.LogLevel.DEBUG);
     wallet.setLoggerCallback((prettyMessage, message, level, categories) => {
-        let logStream = fs.createWriteStream(`./logs/${fileName}.log`, {
+        let logStream = fs.createWriteStream(logDirectory + '/divinewallet.log', {
             flags: 'a'
         });
         logStream.write(prettyMessage + '\n');
     });
-
-    // delete log file if currently present
-    if (fs.existsSync(`${fileName}.log`)) {
-        fs.unlinkSync(`${fileName}.log`);
-    };
 
     // start the wallet
     wallet.start();
@@ -957,7 +968,7 @@ function drawWalletWindow(fileName, password) {
 
     // x keypress
     transferWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
         transferWindow.destroy();
@@ -1005,7 +1016,7 @@ function drawWalletWindow(fileName, password) {
 
     // x keypress
     settingsWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
         transferWindow.destroy();
@@ -1033,7 +1044,7 @@ function drawWalletWindow(fileName, password) {
 
     // x keypress
     walletWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
         transferWindow.destroy();
@@ -1102,7 +1113,7 @@ function drawWalletWindow(fileName, password) {
 
     // quit on top right button
     closeWalletButton.on('press', function() {
-        wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
         wallet.stop();
         walletWindow.destroy();
         navBar.destroy();
@@ -1728,11 +1739,11 @@ function drawWalletWindow(fileName, password) {
 
 // create new wallet and launch it
 function createWallet(fileName, password) {
-    if (fs.existsSync(`./wallets/${fileName}.wallet`)) {
+    if (fs.existsSync(walletDirectory + `/${fileName}.wallet`)) {
         return `${fileName}.wallet already exists, will not overwrite.`;
     };
     const wallet = WB.WalletBackend.createWallet(daemon);
-    wallet.saveWalletToFile(`./wallets/${fileName}.wallet`, password);
+    wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
     wallet.stop();
     drawWalletWindow(fileName, password);
 }
