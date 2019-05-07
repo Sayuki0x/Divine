@@ -1,16 +1,34 @@
+[![NPM](https://nodei.co/npm/divinewallet.png?compact=true)](https://npmjs.org/package/divinewallet)
+
 # Divine
 
-Divine, a TUI (Textual User Interface) wallet for TurtleCoin. CLI-esque with full mouse support.
+Divine, a TUI (Textual User Interface) wallet for TurtleCoin.
 
 https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 
 ## Dependencies
 
-1. `nodejs` installed, check [here](https://nodejs.org/en/download/package-manager/) for information on how to do so.
+1. `nodejs`
+
+[nodejs installation instructions](https://nodejs.org/en/download/package-manager/)
+
 2. `git`
-3. `typescript`  `npm i -g typescript`
+
+3. `typescript` 
+
+`npm i -g typescript`
 
 ## Installation
+
+1. Install Divine globally with the `npm` package manager.
+
+`npm i -g divinewallet`
+
+2. You can now run Divine from anywhere:
+
+`divine`
+
+## Development Setup
 
 1. Clone the repository
 
@@ -29,8 +47,6 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 4. Start the program
 
 `npm start`
-
-
 
 ## todo
 
