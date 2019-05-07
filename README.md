@@ -1,3 +1,6 @@
+[![NPM](https://nodei.co/npm/turtlecoin-wallet-backend.png?compact=true)](https://npmjs.org/package/turtlecoin-wallet-backend)
+
+
 # Divine
 
 Divine, a TUI (Textual User Interface) wallet for TurtleCoin. CLI-esque with full mouse support.
