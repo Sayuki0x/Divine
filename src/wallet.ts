@@ -556,6 +556,11 @@ function drawOpenWindow(error?: any) {
         openWindow.focus();
     })
 
+    password.key(['tab'], function() {
+        screen.focusPop();
+        openWindow.focus();
+    })
+
     password.on('blur', function() {
         openWindow.focus();
     })
@@ -693,7 +698,7 @@ function drawImportWindow(error?: any) {
         parent: importWindow,
         keys: true,
         left: 'center',
-        top: '10%',
+        top: 0,
         width: 42,
         height: 22,
         bg: 'black',
@@ -902,6 +907,11 @@ function drawImportWindow(error?: any) {
     })
 
     scanHeight.key(['escape'], function() {
+        importWindow.focus();
+    })
+
+    scanHeight.key(['tab'], function() {
+        screen.focusPop();
         importWindow.focus();
     })
 
@@ -1156,6 +1166,11 @@ function drawCreateWindow(error?: any) {
     })
 
     password.key(['escape'], function() {
+        createWindow.focus();
+    })
+
+    password.key(['tab'], function() {
+        screen.focusPop();
         createWindow.focus();
     })
 
@@ -1931,6 +1946,11 @@ function drawWalletWindow(fileName, password) {
     });
 
     amountInput.key(['escape'], function() {
+        screen.focusPop();
+        transferWindow.focus();
+    })
+
+    amountInput.key(['tab'], function() {
         screen.focusPop();
         transferWindow.focus();
     })
