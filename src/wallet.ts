@@ -384,6 +384,10 @@ function drawOpenWindow(error?: any) {
         }
     });
 
+    openWindow.key(['tab'], function(ch, key) {
+        fileName.focus();
+    });
+
     // focus the window
     openWindow.focus();
 
@@ -987,6 +991,10 @@ function drawCreateWindow(error?: any) {
     // focus the window
     createWindow.focus();
 
+    createWindow.key(['tab'], function(ch, key) {
+        fileName.focus();
+    });
+
     // pop focus on window click
     createWindow.on('click', function() {
         screen.focusPop();
@@ -1288,21 +1296,25 @@ function drawWalletWindow(fileName, password) {
     transferWindow.on('click', function() {
         screen.focusPop();
         transferWindow.focus();
-    })
+    });
+
+    transferWindow.key(['tab'], function(ch, key) {
+        addressInput.focus();
+    });
 
     // t keypress
     transferWindow.key(['s'], function(ch, key) {
         settingsNavButton.press();
-    })
+    });
 
     transferWindow.key(['w'], function(ch, key) {
         walletNavButton.press();
-    })
+    });
 
     // x keypress
     transferWindow.key(['x', 'escape'], function(ch, key) {
         closeWalletButton.press();
-    })
+    });
 
     let settingsWindow = blessed.box({
         top: '10%',
@@ -1321,17 +1333,17 @@ function drawWalletWindow(fileName, password) {
     // t keypress
     settingsWindow.key(['t'], function(ch, key) {
         transferNavButton.press();
-    })
+    });
 
     // w keypress
     settingsWindow.key(['w'], function(ch, key) {
         walletNavButton.press();
-    })
+    });
 
     // x keypress
     settingsWindow.key(['x', 'escape'], function(ch, key) {
         closeWalletButton.press();
-    })
+    });
 
     settingsWindow.key(['C-c'], function(ch, key) {
         backupKeys.press();
@@ -1353,7 +1365,7 @@ function drawWalletWindow(fileName, password) {
     // x keypress
     walletWindow.key(['x', 'escape'], function(ch, key) {
         closeWalletButton.press();
-    })
+    });
 
     walletWindow.key(['C-c'], function(ch, key) {
         addressButton.press();
