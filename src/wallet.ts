@@ -33,7 +33,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.2.3',
+    title: 'Divine v0.2.4',
     debug: true
 });
 
@@ -189,16 +189,17 @@ function drawStartWindow() {
 
     // o keypress
     startWindow.key(['o'], function(ch, key) {
-        startWindow.destroy();
-        navBar.destroy();
-        drawOpenWindow();
+        openWalletButton.press();
     });
 
     // c keypress
     startWindow.key(['c'], function(ch, key) {
-        startWindow.destroy();
-        navBar.destroy();
-        drawCreateWindow();
+        createWalletButton.press();
+    });
+
+    // c keypress
+    startWindow.key(['i'], function(ch, key) {
+        importWalletButton.press();
     });
 
     startWindow.key(['x', 'escape'], function(ch, key) {
@@ -335,6 +336,12 @@ function drawStartWindow() {
                 bg: 'red'
             }
         }
+    });
+
+    importWalletButton.on('press', function() {
+        startWindow.destroy();
+        navBar.destroy();
+        drawImportWindow();
     });
 
     // render screen
@@ -592,6 +599,356 @@ function drawOpenWindow(error?: any) {
     screen.render();
 
 }
+
+// draw the import window
+function drawImportWindow(error?: any) { 
+
+    // draw the navbar
+    let navBar = blessed.box({
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '10%',
+        bg: 'black'
+    })
+
+    // define notification text
+    let errorText = blessed.text({
+        parent: navBar,
+        top: 'center',
+        left: 'center',
+        fg: 'red'
+    })
+
+    if(error !== undefined) {
+        errorText.setContent(error.toString());
+    }
+
+    // draw the window
+    let importWindow = blessed.box({
+        top: '10%',
+        left: '0%',
+        width: '100%',
+        height: '100%',
+        style: {
+            fg: 'white',
+            bg: 'black',
+        }
+    });
+
+    // focus the window
+    importWindow.focus();
+
+    // pop focus on click
+    importWindow.on('click', function() {
+        screen.focusPop();
+        importWindow.focus();
+    });
+
+    importWindow.key(['tab'], function() {
+        fileName.focus();
+    });
+
+    // enter keypress
+    importWindow.key(['enter'], function(ch, key) {
+        importWalletButton.press();
+    });
+
+    // exit
+    importWindow.key(['x', 'escape'], function(ch, key) {
+        closeWalletButton.press();
+    });
+
+    // append the elements to the screen
+    screen.append(importWindow);
+    screen.append(navBar);
+
+    //  define close wallet button
+    let closeWalletButton = blessed.button({
+        parent: navBar,
+        mouse: true,
+        shrink: true,
+        left: '97%',
+        top: '0%',
+        content: '(x)',
+        style: {
+            bg: 'black',
+            fg: 'red',
+            hover: {
+                bg: 'red',
+                fg: 'white'
+            }
+        }
+    })
+
+    // quit on top right button
+    closeWalletButton.on('press', function() {
+        importWindow.destroy();
+        navBar.destroy();
+        drawSplashScreen();
+    })
+
+    // define "open wallet" info form
+    let importForm = blessed.form({
+        parent: importWindow,
+        keys: true,
+        left: 'center',
+        top: '10%',
+        width: 42,
+        height: 22,
+        bg: 'black',
+        fg: 'red',
+        border: {
+            type: 'line',
+            fg: 'white'
+        }
+    });
+
+    // open form post handling
+    importForm.on('submit', function(data) {
+        const error = importWallet(data.filename, data.password, data.seed, parseInt(data.scanheight));
+        if (error) {
+            drawImportWindow(error);
+        }
+    });
+
+    let importFormLabel = blessed.text({
+        parent: importForm,
+        top: -1,
+        left: 'center',
+        fg: 'white',
+        content: 'Import A Wallet'
+    })
+
+    // define filename textbox label
+    let seedLabel = blessed.text({
+        parent: importForm,
+        keys: true,
+        top: 0,
+        left: 0,
+        fg: 'white',
+        content: 'Mnemonic Seed:'
+    });
+
+    // define filename textbox
+    let walletSeed = blessed.Textarea({
+        parent: importForm,
+        name: 'seed',
+        mouse: true,
+        keys: true,
+        vi: false,
+        top: 1,
+        left: 0,
+        width: 40,
+        inputOnFocus: true,
+        height: 6,
+        content: 'first',
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // enter keypress
+    walletSeed.key(['enter'], function(ch, key) {
+        importWalletButton.press();
+    })
+
+    walletSeed.key(['escape'], function() {
+        importWindow.focus();
+    })
+
+    walletSeed.on('blur', function() {
+        importWindow.focus();
+    })
+
+    // pop focus on textbox click
+    walletSeed.on('click', function() {
+        screen.focusPop();
+    });
+
+    // define filename textbox label
+    let importLabel = blessed.text({
+        parent: importForm,
+        keys: true,
+        top: 7,
+        left: 0,
+        fg: 'white',
+        content: 'Filename:'
+    });
+
+    // define filename textbox
+    let fileName = blessed.textbox({
+        parent: importForm,
+        name: 'filename',
+        mouse: true,
+        keys: true,
+        vi: false,
+        top: 8,
+        left: 0,
+        width: 40,
+        inputOnFocus: true,
+        height: 3,
+        content: 'first',
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // enter keypress
+    fileName.key(['enter'], function(ch, key) {
+        importWalletButton.press();
+    })
+
+    fileName.key(['escape'], function() {
+        importWindow.focus();
+    })
+
+    fileName.on('blur', function() {
+        importWindow.focus();
+    })
+
+    // pop focus on textbox click
+    fileName.on('click', function() {
+        screen.focusPop();
+    });
+
+
+    // define password textbox label
+    let importPasswordLabel = blessed.text({
+        parent: importForm,
+        top: 11,
+        left: 0,
+        fg: 'white',
+        content: 'Password:'
+    });
+
+    // defind password textbox
+    let password = blessed.textbox({
+        parent: importForm,
+        name: 'password',
+        mouse: true,
+        keys: true,
+        vi: false,
+        top: 12,
+        left: 0,
+        width: 40,
+        inputOnFocus: true,
+        censor: true,
+        height: 3,
+        content: 'first',
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // enter keypress
+    password.key(['enter'], function(ch, key) {
+        importWalletButton.press();
+    })
+
+    password.key(['escape'], function() {
+        importWindow.focus();
+    })
+
+    password.on('blur', function() {
+        importWindow.focus();
+    })
+
+    // pop focus on textbox click
+    password.on('click', function() {
+        screen.focusPop();
+    });
+
+    // define filename textbox label
+    let scanHeightLabel = blessed.text({
+        parent: importForm,
+        keys: true,
+        top: 15,
+        left: 0,
+        tags: true,
+        fg: 'white',
+        content: 'Scan Height: {grey-fg}(optional){/}'
+    });
+
+    // define filename textbox
+    let scanHeight = blessed.textbox({
+        parent: importForm,
+        name: 'scanheight',
+        mouse: true,
+        keys: true,
+        vi: false,
+        top: 16,
+        left: 0,
+        width: 40,
+        inputOnFocus: true,
+        height: 3,
+        content: 'first',
+        border: {
+            type: 'line',
+            fg: 'grey'
+        },
+        fg: 'white',
+    });
+
+    // enter keypress
+    scanHeight.key(['enter'], function(ch, key) {
+        importWalletButton.press();
+    })
+
+    scanHeight.key(['escape'], function() {
+        importWindow.focus();
+    })
+
+    scanHeight.on('blur', function() {
+        importWindow.focus();
+    })
+
+    // pop focus on textbox click
+    scanHeight.on('click', function() {
+        screen.focusPop();
+    });
+
+    // define submit button
+    let importWalletButton = blessed.button({
+        parent: importForm,
+        mouse: true,
+        shrink: true,
+        padding: {
+            left: 10,
+            right: 11
+        },
+        left: 0,
+        top: 19,
+        content: 'open wallet (enter)',
+        style: {
+            bg: 'black',
+            fg: 'white',
+            hover: {
+                bg: 'red'
+            }
+        }
+    });
+
+    // on submit button press
+    importWalletButton.on('press', function() {
+        screen.focusPop();
+        importForm.submit();
+        importWindow.destroy();
+        navBar.destroy();
+    });
+
+    // render the screen
+    walletSeed.focus();
+    screen.render();
+
+}
+
 
 // draw the create window
 function drawCreateWindow(error?: any) {
@@ -1658,9 +2015,9 @@ function drawWalletWindow(fileName, password) {
     walletWindow.focus();
     screen.render();
 
+    // return undefined if no error
     return undefined;
-
-}
+};
 
 // create new wallet and launch it
 function createWallet(fileName, password) {
@@ -1671,7 +2028,21 @@ function createWallet(fileName, password) {
     wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
     wallet.stop();
     drawWalletWindow(fileName, password);
-}
+};
+
+// imports a wallet by seed and launch it
+function importWallet(fileName: string, password: string, seed: string, startHeight: number) {
+    if (fs.existsSync(walletDirectory + `/${fileName}.wallet`)) {
+        return `${fileName}.wallet already exists, will not overwrite.`;
+    };
+    const [wallet, error] = WB.WalletBackend.importWalletFromSeed(daemon, startHeight, seed);
+    if (error) {
+        return error;
+    }
+    wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
+    wallet.stop();
+    drawWalletWindow(fileName, password);
+};
 
 // refresh the sync bar
 function refreshSync(syncStatus, wallet, progress) {
@@ -1712,22 +2083,22 @@ function refreshSync(syncStatus, wallet, progress) {
         );
     progress.setProgress(percentSync);
     screen.render();
-}
+};
 
 // convert atomic units to human readable amount
 function humanReadable(amount) {
     return (amount / 100).toFixed(2);
-}
+};
 
 // convert human readable amounts to atomic units
 function atomicUnits(amount) {
     return (amount * 100);
-}
+};
 
 // sleep
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}
+};
 
 // get transactions list for recent transactions table
 function getRecentTransactions(walletData) {
@@ -1736,7 +2107,7 @@ function getRecentTransactions(walletData) {
         amountArray.push([convertTimestamp(tx.timestamp), numberWithCommas(humanReadable(tx.totalAmount()))]);
     }
     return amountArray;
-}
+};
 
 // convert unix timestamp into human readable
 function convertTimestamp(timestamp) {
@@ -1750,12 +2121,12 @@ function convertTimestamp(timestamp) {
     // ie: 2013-02-18, 16:35
     time = yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + min;
     return time;
-}
+};
 
 // lot to divinewallet.log
 function logFile(data) {
     walletLogStream.write(`${convertTimestamp(Date.now())} ${data} \n`);
-}
+};
 
 async function notifyUser(notificationArea: any, message: string, wait: number) {
     notificationArea.setContent(message);
@@ -1764,9 +2135,9 @@ async function notifyUser(notificationArea: any, message: string, wait: number) 
     await sleep(wait);
     notificationArea.setContent('');
     screen.render();
-}
+};
 
 // function to format numbers with commas like currency
 function numberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
+};
