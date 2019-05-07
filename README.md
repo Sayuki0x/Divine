@@ -8,9 +8,15 @@ https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 
 ## Dependencies
 
-1. `nodejs`                  [nodejs installation instructions](https://nodejs.org/en/download/package-manager/)
+1. `nodejs`
+
+[nodejs installation instructions](https://nodejs.org/en/download/package-manager/)
+
 2. `git`
-3. `typescript`              `npm i -g typescript`
+
+3. `typescript` 
+
+`npm i -g typescript`
 
 ## Installation
 
