@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 ///////////////////////////////////////////////////////////////
 //    Copyright ExtraHash 2019                              //
 //    Please see included LICENSE file for more details    //
@@ -10,7 +12,7 @@ import blessed = require('blessed');
 import contrib = require('blessed-contrib');
 import fs from 'fs';
 
-let walletLogStream = fs.createWriteStream(`divinewallet.log`, {
+let walletLogStream = fs.createWriteStream(`./logs/divinewallet.log`, {
     flags: 'a'
 });
 
@@ -20,7 +22,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'DivineWallet v0.2.1',
+    title: 'DivineWallet v0.2.2',
     debug: true
 });
 
