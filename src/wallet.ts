@@ -493,7 +493,7 @@ function drawOpenWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -542,7 +542,7 @@ function drawOpenWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -745,7 +745,7 @@ function drawImportWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -793,7 +793,7 @@ function drawImportWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -842,7 +842,7 @@ function drawImportWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -873,7 +873,7 @@ function drawImportWindow(error?: any) {
         left: 0,
         tags: true,
         fg: 'white',
-        content: 'Scan Height: {grey-fg}(optional){/}'
+        content: 'Scan Height: (optional)'
     });
 
     // define filename textbox
@@ -891,7 +891,7 @@ function drawImportWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1095,7 +1095,7 @@ function drawCreateWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1145,7 +1145,7 @@ function drawCreateWindow(error?: any) {
         content: 'first',
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1495,7 +1495,7 @@ function drawWalletWindow(fileName, password) {
         top: 0,
         left: '50%',
         tags: true,
-        fg: 'grey',
+        fg: 'white',
     })
 
     ///////////////////////////////////////////////////////////////////
@@ -1533,7 +1533,7 @@ function drawWalletWindow(fileName, password) {
         parent: leftColumn,
         top: 3,
         left: 0,
-        fg: 'grey',
+        fg: 'white',
         tags: true,
         content: '{|}ctrl+c: copy address{/}'
     })
@@ -1602,7 +1602,7 @@ function drawWalletWindow(fileName, password) {
     walletBalanceLabels.setContent(
         ' {bold}Available:{/}\n' +
         ' {bold}{red-fg}Locked:{/}\n' +
-        ' {grey-fg}Total:{/}'
+        ' Total:'
     );
 
     // get balance
@@ -1612,7 +1612,7 @@ function drawWalletWindow(fileName, password) {
     walletBalance.setContent(
         `{|}{bold}${WB.prettyPrintAmount(walletBalanceData[0])}{/} \n` +
         `{|}{bold}{red-fg}${WB.prettyPrintAmount(walletBalanceData[1])}{/} \n` +
-        `{|}{grey-fg}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/} `);
+        `{|}${WB.prettyPrintAmount(walletBalanceData[1] + walletBalanceData[0])}{/} `);
 
 
     //////////////////////////////////// RIGHT COLUMN CODE STARTS HERE
@@ -1633,7 +1633,7 @@ function drawWalletWindow(fileName, password) {
     let transactionTable = contrib.table({
         parent: rightColumn,
         bg: 'black',
-        fg: 'grey',
+        fg: 'white',
         selectedFg: 'white',
         selectedBg: 'black',
         label: 'Recent Transactions',
@@ -1691,7 +1691,7 @@ function drawWalletWindow(fileName, password) {
             `${mnenomicSeed}`
             
         clipboardy.writeSync(backupMessage);
-        notifyUser(notificationText, '{bold}{red-fg}PRIVATE KEYS COPIED TO CLIPBOARD{/}', 500);
+        notifyUser(notificationText, '{bold}{red-fg}PRIVATE KEYS COPIED TO CLIPBOARD{/}', 2000);
         settingsWindow.focus();
     });
 
@@ -1790,17 +1790,12 @@ function drawWalletWindow(fileName, password) {
             await notifyUser(errorText, error.toString(), 5000);
             transferForm.reset();
         } else {
-            let transactionKeyLock = blessed.Loading({
-                parent: navBar,
-                height: 'center',
-                width: 'center',
-                fg: 'white'
-            })
+            transferWindow.hide();
+            walletWindow.show();
             walletWindow.setFront();
             walletWindow.focus();
             screen.render();
-            await notifyUser(notificationText, `{white-fg}{bold}Sent succesfully!{/bold}`, 2000);
-            transactionKeyLock.stop();
+            await notifyUser(notificationText, `{white-fg}{bold}Sent succesfully!{/bold}`, 3000);
         } 
     });
 
@@ -1835,7 +1830,7 @@ function drawWalletWindow(fileName, password) {
         vi: false,
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1865,7 +1860,7 @@ function drawWalletWindow(fileName, password) {
         left: 0,
         fg: 'white',
         tags: true,
-        content: 'Payment ID: {grey-fg}(optional)'
+        content: 'Payment ID: (optional)'
     });
 
     // defind password textbox
@@ -1881,7 +1876,7 @@ function drawWalletWindow(fileName, password) {
         height: 3,
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1926,7 +1921,7 @@ function drawWalletWindow(fileName, password) {
         height: 3,
         border: {
             type: 'line',
-            fg: 'grey'
+            fg: 'white'
         },
         fg: 'white',
     });
@@ -1996,7 +1991,7 @@ function drawWalletWindow(fileName, password) {
         walletBalance.setContent(
             `{|}{bold}${WB.prettyPrintAmount(updateBalance[0])}{/}\n` +
             `{|}{bold}{red-fg}${WB.prettyPrintAmount(updateBalance[1])}{/}\n` +
-            `{|}{grey-fg}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}{/}`);
+            `{|}${WB.prettyPrintAmount(updateBalance[1] + updateBalance[0])}`);
 
         let updateTransactionList = wallet.getTransactions();
 
