@@ -386,18 +386,18 @@ function drawOpenWindow(error?: any) {
         openWindow.focus();
     });
 
+    openWindow.key(['tab'], function() {
+        fileName.focus();
+    });
+
     // enter keypress
     openWindow.key(['enter'], function(ch, key) {
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
-    })
+        openWalletButton.press();
+    });
 
     // exit
     openWindow.key(['x', 'escape'], function(ch, key) {
-        openWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
+        closeWalletButton.press();
     });
 
     // append the elements to the screen
@@ -493,26 +493,20 @@ function drawOpenWindow(error?: any) {
 
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
-        screen.focusPop();
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
+        openWalletButton.press();
     })
 
     fileName.key(['escape'], function() {
-        screen.focusPop();
         openWindow.focus();
     })
 
     fileName.on('blur', function() {
-        screen.focusPop();
         openWindow.focus();
     })
 
     // pop focus on textbox click
     fileName.on('click', function() {
         screen.focusPop();
-        screen.render();
     });
 
 
@@ -548,26 +542,20 @@ function drawOpenWindow(error?: any) {
 
     // enter keypress
     password.key(['enter'], function(ch, key) {
-        screen.focusPop();
-        openForm.submit();
-        openWindow.destroy();
-        navBar.destroy();
+        openWalletButton.press();
     })
 
     password.key(['escape'], function() {
-        screen.focusPop();
         openWindow.focus();
     })
 
     password.on('blur', function() {
-        screen.focusPop();
         openWindow.focus();
     })
 
     // pop focus on textbox click
     password.on('click', function() {
         screen.focusPop();
-        screen.render();
     });
 
     // define submit button
@@ -638,22 +626,18 @@ function drawCreateWindow(error?: any) {
         createWindow.focus();
     });
 
+    createWindow.key(['tab'], function() {
+        fileName.focus();
+    });
+
     // enter keypress
     createWindow.key(['enter'], function(ch, key) {
         createWalletButton.press();
     })
 
     createWindow.key(['x', 'escape'], function(ch, key) {
-        createWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
+        closeWalletButton.press();
     });
-
-    // exit on x keypress
-    createWindow.key('x', function() {
-        createWindow.destroy();
-        drawSplashScreen();
-    })
 
     // define error text
     let errorText = blessed.text({
@@ -664,6 +648,7 @@ function drawCreateWindow(error?: any) {
         fg: 'red',
     })
 
+    // this error is getting passed into the function if there is an error opening a wallet
     if (error) {
         errorText.setContent(error);
     }
@@ -762,26 +747,20 @@ function drawCreateWindow(error?: any) {
 
     // enter keypress
     fileName.key(['enter'], function(ch, key) {
-        screen.focusPop();
-        createForm.submit();
-        createWindow.destroy();
-        navBar.destroy();
+        createWalletButton.press();
     })
 
     fileName.key(['escape'], function() {
-        screen.focusPop();
         createWindow.focus();
     })
 
     fileName.on('blur', function() {
-        screen.focusPop();
         createWindow.focus();
     })
 
     // pop focus on textbox click
     fileName.on('click', function() {
         screen.focusPop();
-        screen.render();
     });
 
     // define password textbox label
@@ -816,26 +795,20 @@ function drawCreateWindow(error?: any) {
 
     // enter keypress
     password.key(['enter'], function(ch, key) {
-        screen.focusPop();
-        createForm.submit();
-        createWindow.destroy();
-        navBar.destroy();
+        createWalletButton.press();
     })
 
     password.key(['escape'], function() {
-        screen.focusPop();
         createWindow.focus();
     })
 
     password.on('blur', function() {
-        screen.focusPop();
         createWindow.focus();
     })
 
     // pop focus on textbox click
     password.on('click', function() {
         screen.focusPop();
-        screen.render();
     });
 
     // define create form submit button
@@ -937,6 +910,9 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    transferWindow.hide();
+
+
     transferWindow.on('click', function() {
         screen.focusPop();
         transferWindow.focus();
@@ -944,37 +920,16 @@ function drawWalletWindow(fileName, password) {
 
     // t keypress
     transferWindow.key(['s'], function(ch, key) {
-        screen.focusPop();
-        settingsWindow.setFront();
-        settingsWindow.focus();
-        screen.render();
+        settingsNavButton.press();
     })
 
     transferWindow.key(['w'], function(ch, key) {
-        // draw the window
-        screen.focusPop();
-        walletWindow.setFront();
-        walletWindow.focus();
-        screen.render();
-    })
-
-    // t keypress
-    transferWindow.key(['t'], function(ch, key) {
-        screen.focusPop();
-        transferWindow.setFront();
-        addressInput.focus();
-        screen.render();
+        walletNavButton.press();
     })
 
     // x keypress
     transferWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
-        wallet.stop();
-        walletWindow.destroy();
-        transferWindow.destroy();
-        settingsWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
+        closeWalletButton.press();
     })
 
     let settingsWindow = blessed.box({
@@ -989,40 +944,21 @@ function drawWalletWindow(fileName, password) {
         }
     });
 
+    settingsWindow.hide();
+
     // t keypress
     settingsWindow.key(['t'], function(ch, key) {
-        screen.focusPop();
-        transferWindow.setFront();
-        addressInput.focus();
-        screen.render();
-    })
-
-    // s keypress
-    settingsWindow.key(['s'], function(ch, key) {
-        screen.focusPop();
-        settingsWindow.setFront();
-        settingsWindow.focus();
-        screen.render();
+        transferNavButton.press();
     })
 
     // w keypress
     settingsWindow.key(['w'], function(ch, key) {
-        // draw the window
-        screen.focusPop();
-        walletWindow.setFront();
-        walletWindow.focus();
-        screen.render();
+        walletNavButton.press();
     })
 
     // x keypress
     settingsWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
-        wallet.stop();
-        walletWindow.destroy();
-        transferWindow.destroy();
-        settingsWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
+        closeWalletButton.press();
     })
 
     settingsWindow.key(['C-c'], function(ch, key) {
@@ -1044,13 +980,7 @@ function drawWalletWindow(fileName, password) {
 
     // x keypress
     walletWindow.key(['x', 'escape'], function(ch, key) {
-        wallet.saveWalletToFile(walletDirectory + `/${fileName}.wallet`, password);
-        wallet.stop();
-        walletWindow.destroy();
-        transferWindow.destroy();
-        settingsWindow.destroy();
-        navBar.destroy();
-        drawSplashScreen();
+        closeWalletButton.press();
     })
 
     walletWindow.key(['C-c'], function(ch, key) {
@@ -1059,26 +989,12 @@ function drawWalletWindow(fileName, password) {
 
     // t keypress
     walletWindow.key(['t'], function(ch, key) {
-        screen.focusPop();
-        transferWindow.setFront();
-        addressInput.focus();
-        screen.render();
+        transferNavButton.press();
     });
 
     // t keypress
     walletWindow.key(['s'], function(ch, key) {
-        screen.focusPop();
-        settingsWindow.setFront();
-        settingsWindow.focus();
-        screen.render();
-    });
-
-    walletWindow.key(['w'], function(ch, key) {
-        // draw the window
-        screen.focusPop();
-        walletWindow.setFront();
-        walletWindow.focus();
-        screen.render();
+        settingsNavButton.press();
     });
 
     // append the elements
@@ -1144,6 +1060,9 @@ function drawWalletWindow(fileName, password) {
     })
 
     walletNavButton.on('press', function() {
+        settingsWindow.hide();
+        transferWindow.hide();
+        walletWindow.show();
         walletWindow.setFront();
         walletWindow.focus();
         screen.render();
@@ -1173,6 +1092,9 @@ function drawWalletWindow(fileName, password) {
     })
 
     transferNavButton.on('press', function() {
+        walletWindow.hide();
+        settingsWindow.hide();
+        transferWindow.show();
         transferWindow.setFront();
         addressInput.focus();
         screen.render();
@@ -1202,6 +1124,9 @@ function drawWalletWindow(fileName, password) {
     })
 
     settingsNavButton.on('press', function() {
+        walletWindow.hide();
+        transferWindow.hide();
+        settingsWindow.show();
         settingsWindow.setFront();
         settingsWindow.focus();
         screen.render();
