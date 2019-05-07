@@ -6,6 +6,10 @@ Divine, a TUI (Textual User Interface) wallet for TurtleCoin.
 
 https://github.com/turtlecoin/turtlecoin-wallet-nodejs
 
+![walletscreen screenshot](https://raw.githubusercontent.com/turtlecoin/turtlecoin-wallet-nodejs/development/screenshots/walletscreen.png)
+
+https://raw.githubusercontent.com/turtlecoin/turtlecoin-wallet-nodejs/development/screenshots/walletscreen.png
+
 ## Dependencies
 
 1. `nodejs`
