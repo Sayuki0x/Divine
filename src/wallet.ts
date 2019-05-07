@@ -33,7 +33,7 @@ const daemon = new WB.BlockchainCacheApi('blockapi.turtlepay.io', true);
 // setup and configure screen instance
 let screen = blessed.screen({
     smartCSR: true,
-    title: 'Divine v0.2.4',
+    title: 'Divine v0.2.5',
     debug: true
 });
 
