@@ -1,4 +1,4 @@
-[![NPM](https://nodei.co/npm/turtlecoin-wallet-backend.png?compact=true)](https://npmjs.org/package/divinewallet)
+[![NPM](https://nodei.co/npm/divinewallet.png?compact=true)](https://npmjs.org/package/divinewallet)
 
 
 # Divine
